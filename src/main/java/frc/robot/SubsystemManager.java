@@ -1,6 +1,6 @@
 package frc.robot;
 
-import firelib.subsystem.*;
+import firelib.subsystem.ISubsystem;
 
 import java.util.ArrayList;
 import java.util.List;

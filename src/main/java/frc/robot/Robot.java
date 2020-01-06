@@ -35,10 +35,12 @@ public class Robot extends TimedRobot {
  }
  @Override
  public void autonomousInit() {
+   //TODO add logic
  }
 
  @Override
  public void autonomousPeriodic() {
+   //TODO add logic
  }
 
  @Override
@@ -48,14 +50,17 @@ public class Robot extends TimedRobot {
 
  @Override
  public void teleopPeriodic() {
+   //TODO add logic
  }
 
  @Override
  public void testInit() {
+   //TODO add logic
  }
 
  @Override
  public void testPeriodic() {
+   //TODO add logic
  }
 
 }
