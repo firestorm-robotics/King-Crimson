@@ -12,4 +12,19 @@ public class Kinematics {
         
         return signal;
     }
+
+    public DriveSignal toCurveWheelSpeeds(double vel, double curv) {
+
+        double theta  = vel;
+        double radius;
+        if(curv == 0) {
+            return toWheelSpeeds(vel, curv);
+        } else {
+            radius = 1/curv;
+        }
+
+        double leftSpeed  = theta*(radius+(mTrackWidth/2));
+        double rightSpeed = theta*(radius-(mTrackWidth/2));
+        return new DriveSignal(leftSpeed, rightSpeed);
+    }
 }

@@ -44,6 +44,15 @@ public class Drivetrain implements ISubsystem {
         mMotorBase.setVelocity(signal.getLeftSpeed(),signal.getRightSpeed());
     }
 
+    /**
+     * interface for curvature driving
+     * untested
+     */
+    public void curvatureDrive() {
+        DriveSignal signal = kinematics.toCurveWheelSpeeds(mPeriodicIO.mDemandedFwd, mPeriodicIO.mDemandedCurv);
+        mMotorBase.setVelocity(signal.getLeftSpeed(), signal.getRightSpeed());
+    }
+
     @Override
     public void updateSmartDashboard() {
         // TODO Auto-generated method stub
