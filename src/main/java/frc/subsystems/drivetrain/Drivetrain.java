@@ -9,16 +9,11 @@ import firelib.subsystem.ISubsystem;
 import frc.robot.RobotMap;
 
 public class Drivetrain implements ISubsystem {
-
-    private class PeriodicIO {
-        public double mDemandedFwd  = 0;
-        public double mDemandedRot  = 0;
-        public double mDemandedSpd  = 0; 
-        public double mDemandedCurv = 0;
-        public int    mLeftVel = 0;
-        public int    mRightVel = 0;
-    }
     private static Drivetrain instance;
+    private PeriodicIO mPeriodicIO = new PeriodicIO();
+    private MotorBase mMotorBase;
+    
+    
     /**
      * singleton method for use throughout the robot
      * @return
@@ -29,8 +24,7 @@ public class Drivetrain implements ISubsystem {
         }
         return instance;
     }
-    private PeriodicIO mPeriodicIO = new PeriodicIO();
-    private MotorBase mMotorBase;
+    
     
     /**
      * ctor  -- DO NOT USE -- 
@@ -90,6 +84,15 @@ public class Drivetrain implements ISubsystem {
             }
         });
 
+    }
+
+    private class PeriodicIO {
+        public double mDemandedFwd  = 0;
+        public double mDemandedRot  = 0;
+        public double mDemandedSpd  = 0; 
+        public double mDemandedCurv = 0;
+        public int    mLeftVel = 0;
+        public int    mRightVel = 0;
     }
     
 }
