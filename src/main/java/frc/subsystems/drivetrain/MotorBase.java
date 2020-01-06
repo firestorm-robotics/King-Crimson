@@ -30,4 +30,12 @@ public class MotorBase {
         mMasterLeft.set(ControlMode.PercentOutput,leftVel);
         mMasterRight.set(ControlMode.PercentOutput,rightVel);
     }
+
+    public int getLeftVelocity() {
+        return mMasterLeft.getSelectedSensorVelocity();
+    }
+
+    public int getRightVelocity() {
+        return mMasterRight.getSelectedSensorVelocity();
+    }
 }
