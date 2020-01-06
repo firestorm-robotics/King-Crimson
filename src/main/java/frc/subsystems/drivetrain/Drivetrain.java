@@ -12,6 +12,7 @@ public class Drivetrain implements ISubsystem {
     private static Drivetrain instance;
     private PeriodicIO mPeriodicIO = new PeriodicIO();
     private MotorBase mMotorBase;
+    private Kinematics kinematics = new Kinematics(1);
     
     
     /**
@@ -39,9 +40,8 @@ public class Drivetrain implements ISubsystem {
      * basic drive code for early testing
      */
     public void cartersianDrive() {
-        double left = mPeriodicIO.mDemandedFwd + mPeriodicIO.mDemandedRot;
-        double right = mPeriodicIO.mDemandedFwd - mPeriodicIO.mDemandedRot;
-        mMotorBase.setVelocity(left, right);
+        DriveSignal signal = kinematics.toWheelSpeeds(mPeriodicIO.mDemandedFwd, mPeriodicIO.mDemandedRot);
+        mMotorBase.setVelocity(signal.getLeftSpeed(),signal.getRightSpeed());
     }
 
     @Override
