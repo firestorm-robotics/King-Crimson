@@ -98,7 +98,6 @@ public class Drivetrain implements ISubsystem {
     private class PeriodicIO {
         public double mDemandedFwd  = 0;
         public double mDemandedRot  = 0;
-        public double mDemandedSpd  = 0; 
         public double mDemandedCurv = 0;
         public int    mLeftVel = 0;
         public int    mRightVel = 0;
