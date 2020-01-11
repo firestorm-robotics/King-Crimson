@@ -6,40 +6,40 @@ public class Kinematics {
     private final double mTrackWidth;
     private final double mMaxOmega;
     private final double mMaxVel;
-    public Kinematics(double trackWidth,double maxVel) {
+
+    public Kinematics(double trackWidth, double maxVel) {
         mTrackWidth = trackWidth;
         mMaxVel = maxVel;
-        mMaxOmega = (mMaxVel*2)/mTrackWidth;
+        mMaxOmega = (mMaxVel * 2) / mTrackWidth;
 
     }
 
-
     public DriveSignal toWheelSpeeds(double vel, double omega) {
-        vel = vel*mMaxVel;
-        omega = omega*mMaxOmega;
-        DriveSignal signal = new DriveSignal((vel - ((mTrackWidth / 2) * omega))/mMaxVel,
-         ((vel + ((mTrackWidth / 2) * omega))/mMaxVel));
-         SmartDashboard.putNumber("left", signal.getLeftSpeed());
-         SmartDashboard.putNumber("right", signal.getRightSpeed());
-        
+        vel = vel * mMaxVel;
+        omega = omega * mMaxOmega;
+        DriveSignal signal = new DriveSignal((vel - ((mTrackWidth / 2) * omega)) / mMaxVel,
+                ((vel + ((mTrackWidth / 2) * omega)) / mMaxVel));
+        SmartDashboard.putNumber("left", signal.getLeftSpeed());
+        SmartDashboard.putNumber("right", signal.getRightSpeed());
+
         return signal;
     }
 
     public DriveSignal toCurveWheelSpeeds(double vel, double curv) {
 
-        double omega  = vel*mMaxOmega;
+        double omega = vel * mMaxOmega;
         double radius;
-        if(vel == 0 || curv == 0) {
+        if (vel == 0 || curv == 0) {
             return toWheelSpeeds(vel, curv);
         } else {
-            radius = Math.log(curv+1);
-            radius*=(curv/Math.abs(curv));
+            radius = Math.log(curv + 1);
+            radius *= (curv / Math.abs(curv));
         }
 
-        double leftSpeed  = omega*(radius+(mTrackWidth/2));
-        double rightSpeed = omega*(radius-(mTrackWidth/2));
+        double leftSpeed = omega * (radius + (mTrackWidth / 2));
+        double rightSpeed = omega * (radius - (mTrackWidth / 2));
         SmartDashboard.putNumber("left", leftSpeed);
         SmartDashboard.putNumber("right", rightSpeed);
-        return new DriveSignal(leftSpeed/mMaxVel, rightSpeed/mMaxVel);
+        return new DriveSignal(leftSpeed / mMaxVel, rightSpeed / mMaxVel);
     }
 }
