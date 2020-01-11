@@ -19,8 +19,8 @@ public class MotorBase {
         mMasterLeft.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
         mMasterRight.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
 
-        mMasterRight.setInverted(true);
-        mSlaveRight.setInverted(true);
+        mMasterLeft.setInverted(true);
+        mSlaveLeft.setInverted(true);
 
         mSlaveLeft.follow(mMasterLeft);
         mSlaveRight.follow(mMasterRight);

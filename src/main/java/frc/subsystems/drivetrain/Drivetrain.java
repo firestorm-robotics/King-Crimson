@@ -2,7 +2,6 @@ package frc.subsystems.drivetrain;
 
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
-
 import firelib.looper.ILooper;
 import firelib.looper.Loop;
 import firelib.subsystem.ISubsystem;
@@ -12,7 +11,7 @@ public class Drivetrain implements ISubsystem {
     private static Drivetrain instance;
     private PeriodicIO mPeriodicIO = new PeriodicIO();
     private MotorBase mMotorBase;
-    private Kinematics kinematics = new Kinematics(1);
+    private Kinematics kinematics = new Kinematics(0.508,3.6);
     
     
     /**
@@ -36,20 +35,25 @@ public class Drivetrain implements ISubsystem {
         
     }
 
+    public void setPeriodicIO(double demandedThrottle, double demandedRot) {
+        mPeriodicIO.mDemandedThrottle = demandedThrottle;
+        mPeriodicIO.mDemandedRot = demandedRot;
+
+    }
+
     /**
      * basic drive code for early testing
      */
     public void cartersianDrive() {
-        DriveSignal signal = kinematics.toWheelSpeeds(mPeriodicIO.mDemandedFwd, mPeriodicIO.mDemandedRot);
-        mMotorBase.setVelocity(signal.getLeftSpeed(),signal.getRightSpeed());
+        DriveSignal signal = kinematics.toWheelSpeeds(mPeriodicIO.mDemandedThrottle, mPeriodicIO.mDemandedRot);
+        mMotorBase.setVelocity(signal.getLeftSpeed(), signal.getRightSpeed());
     }
 
     /**
-     * interface for curvature driving
-     * untested
+     * interface for curvature driving untested
      */
     public void curvatureDrive() {
-        DriveSignal signal = kinematics.toCurveWheelSpeeds(mPeriodicIO.mDemandedFwd, mPeriodicIO.mDemandedCurv);
+        DriveSignal signal = kinematics.toCurveWheelSpeeds(mPeriodicIO.mDemandedThrottle, mPeriodicIO.mDemandedRot);
         mMotorBase.setVelocity(signal.getLeftSpeed(), signal.getRightSpeed());
     }
 
@@ -96,10 +100,8 @@ public class Drivetrain implements ISubsystem {
     }
 
     private class PeriodicIO {
-        public double mDemandedFwd  = 0;
+        public double mDemandedThrottle  = 0;
         public double mDemandedRot  = 0;
-        public double mDemandedSpd  = 0; 
-        public double mDemandedCurv = 0;
         public int    mLeftVel = 0;
         public int    mRightVel = 0;
     }
