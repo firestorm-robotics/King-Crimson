@@ -10,7 +10,9 @@ package frc.robot;
 import java.util.Arrays;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import firelib.looper.Looper;
+import frc.controls.ControlBoard;
 /**
  * The VM is configured to automatically run this class, and to call the
  * functions corresponding to each mode, as described in the TimedRobot
@@ -18,49 +20,60 @@ import firelib.looper.Looper;
  * creating this project, you must also update the build.gradle file in the
  * project.
  */
+import frc.subsystems.drivetrain.Drivetrain;
+import frc.utils.KingMathUtils;
+
 public class Robot extends TimedRobot {
   private Looper mEnabledLooper = new Looper();
   private Looper mDisabledLooper = new Looper();
-  private final SubsystemManager mSubsystemManager = new SubsystemManager(Arrays.asList());
- @Override
- public void robotInit() {
-   mSubsystemManager.registerEnabledLoops(mEnabledLooper);
-   mSubsystemManager.registerDisabledLoops(mDisabledLooper);
- }
+  private ControlBoard mControls = ControlBoard.getInstance();
+  private Drivetrain mDrivetrain = Drivetrain.getInstance();
+  private final SubsystemManager mSubsystemManager = new SubsystemManager(Arrays.asList(mDrivetrain));
 
- @Override
- public void disabledPeriodic() {
-   mEnabledLooper.stop();
-   mDisabledLooper.start();
- }
- @Override
- public void autonomousInit() {
-   //TODO add logic
- }
+  @Override
+  public void robotInit() {
+    mSubsystemManager.registerEnabledLoops(mEnabledLooper);
+    mSubsystemManager.registerDisabledLoops(mDisabledLooper);
+  }
 
- @Override
- public void autonomousPeriodic() {
-   //TODO add logic
- }
+  @Override
+  public void disabledPeriodic() {
+    mEnabledLooper.stop();
+    mDisabledLooper.start();
+  }
 
- @Override
- public void teleopInit() {
-   mEnabledLooper.start();
- }
+  @Override
+  public void autonomousInit() {
+    // TODO add logic
+  }
 
- @Override
- public void teleopPeriodic() {
-   //TODO add logic
- }
+  @Override
+  public void autonomousPeriodic() {
+    // TODO add logic
+  }
 
- @Override
- public void testInit() {
-   //TODO add logic
- }
+  @Override
+  public void teleopInit() {
+    mEnabledLooper.start();
+  }
 
- @Override
- public void testPeriodic() {
-   //TODO add logic
- }
+  @Override
+  public void teleopPeriodic() {
+    double throttle = KingMathUtils.clampD(mControls.getYThrottle(),0.075);
+    double rot = KingMathUtils.clampD(mControls.getXThrottle(),0.075);
+    SmartDashboard.putNumber("y",throttle);
+    SmartDashboard.putNumber("x",rot);
+    mDrivetrain.setPeriodicIO(-KingMathUtils.logit(-throttle), -KingMathUtils.turnExp(-rot));
+  }
+
+  @Override
+  public void testInit() {
+    // TODO add logic
+  }
+
+  @Override
+  public void testPeriodic() {
+    // TODO add logic
+  }
 
 }
