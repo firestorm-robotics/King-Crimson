@@ -5,4 +5,7 @@ public class RobotMap {
                             DRIVETRAIN_LEFT_SLAVE   = 11,
                             DRIVETRAIN_RIGHT_MASTER = 12,
                             DRIVETRAIN_RIGHT_SLAVE  = 13;
+
+    public static final int SHOOTER_LEFT = 10,
+                            SHOOTER_RIGHT = 11;
 }
