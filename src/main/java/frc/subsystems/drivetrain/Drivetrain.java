@@ -66,8 +66,8 @@ public class Drivetrain implements ISubsystem {
     @Override
     public void pollTelemetry() {
         // TODO Auto-generated method stub
-        mPeriodicIO.mLeftVel = mMotorBase.getLeftVelocity();
-        mPeriodicIO.mRightVel = mMotorBase.getRightVelocity();
+        mPeriodicIO.mLeftVel = 0;
+        mPeriodicIO.mRightVel = 0;
 
     }
 

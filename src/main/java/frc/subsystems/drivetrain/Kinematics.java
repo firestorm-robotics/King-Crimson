@@ -19,8 +19,6 @@ public class Kinematics {
         omega = omega * mMaxOmega;
         DriveSignal signal = new DriveSignal((vel - ((mTrackWidth / 2) * omega)) / mMaxVel,
                 ((vel + ((mTrackWidth / 2) * omega)) / mMaxVel));
-        SmartDashboard.putNumber("left", signal.getLeftSpeed());
-        SmartDashboard.putNumber("right", signal.getRightSpeed());
 
         return signal;
     }
@@ -38,8 +36,6 @@ public class Kinematics {
 
         double leftSpeed = omega * (radius + (mTrackWidth / 2));
         double rightSpeed = omega * (radius - (mTrackWidth / 2));
-        SmartDashboard.putNumber("left", leftSpeed);
-        SmartDashboard.putNumber("right", rightSpeed);
         return new DriveSignal(leftSpeed / mMaxVel, rightSpeed / mMaxVel);
     }
 }

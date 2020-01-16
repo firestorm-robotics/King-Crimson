@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import firelib.looper.Looper;
 import frc.controls.ControlBoard;
 import frc.subsystems.Shooter;
+import frc.subsystems.Shooter.ShooterStates;
 /**
  * The VM is configured to automatically run this class, and to call the
  * functions corresponding to each mode, as described in the TimedRobot
@@ -66,9 +67,11 @@ public class Robot extends TimedRobot {
     boolean wantsShoot = mControls.getShoot();
 
     if(wantsShoot) {
-      mShooter.set(0.90);
+      mShooter.setIO(0,4500);
+      mShooter.setState(ShooterStates.SPINNING_UP);
     } else {
-      mShooter.set(0);
+      mShooter.setIO(0,0);
+      mShooter.setState(ShooterStates.IDLE);
     }
 
 

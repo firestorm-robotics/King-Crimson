@@ -17,9 +17,6 @@ public class MotorBase {
         mSlaveLeft = slaveLeft;
         mSlaveRight = slaveRight;
 
-        mMasterLeft.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
-        mMasterRight.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
-
         mMasterLeft.setInverted(true);
         mSlaveLeft.setInverted(true);
 
@@ -30,13 +27,5 @@ public class MotorBase {
     public void setVelocity(double leftVel, double rightVel) {
         mMasterLeft.set(ControlMode.PercentOutput, leftVel);
         mMasterRight.set(ControlMode.PercentOutput, rightVel);
-    }
-
-    public int getLeftVelocity() {
-        return mMasterLeft.getSelectedSensorVelocity();
-    }
-
-    public int getRightVelocity() {
-        return mMasterRight.getSelectedSensorVelocity();
     }
 }
