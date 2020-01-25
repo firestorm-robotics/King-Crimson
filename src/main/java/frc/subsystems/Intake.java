@@ -6,7 +6,6 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import firelib.looper.ILooper;
 import firelib.looper.Loop;
 import firelib.subsystem.StateSubsystem;
@@ -68,6 +67,7 @@ public class Intake extends StateSubsystem<IntakeState> {
 
             @Override
             public void onStop(double timestamp) {
+                stopIntake();
             }
 
             @Override

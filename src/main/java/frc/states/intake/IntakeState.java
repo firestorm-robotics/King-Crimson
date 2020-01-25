@@ -1,6 +1,6 @@
 package frc.states.intake;
 
-import firelib.statecontrol.*;
+import firelib.statecontrol.State;
 
 public abstract class IntakeState extends State {
 
