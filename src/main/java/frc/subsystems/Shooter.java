@@ -87,8 +87,8 @@ public class Shooter implements ISubsystem {
     }
 
     public void stop() {
-        mLeftPID.setReference(0, ControlType.kDutyCycle);
-        mRightPID.setReference(0, ControlType.kDutyCycle);
+        mShooterLeft.set(0);
+        mShooterRight.set(0);
     }
 
     /**
