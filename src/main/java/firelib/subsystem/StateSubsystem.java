@@ -1,11 +1,10 @@
 package firelib.subsystem;
-
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import firelib.statecontrol.*;
 
 public abstract class StateSubsystem<T extends State> implements ISubsystem {
-    protected HashMap<String, T> mStates = new HashMap<String, T>();
+    protected ConcurrentHashMap<String, T> mStates = new ConcurrentHashMap<String, T>();
     protected T mDesiredState;
     protected T mCurrentState;
 

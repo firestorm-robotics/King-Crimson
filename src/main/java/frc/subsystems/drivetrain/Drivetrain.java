@@ -28,14 +28,14 @@ public class Drivetrain implements ISubsystem {
     }
 
     /**
-     * ctor -- DO NOT USE -- expect for unit testing
+     * ctor -- DO NOT USE -- except for unit testing
      */
     public Drivetrain(TalonSRX masterLeft, TalonSRX masterRight, VictorSPX slaveLeft, VictorSPX slaveRight) {
         mMotorBase = new MotorBase(masterLeft, masterRight, slaveLeft, slaveRight);
 
     }
 
-    public void setPeriodicIO(double demandedThrottle, double demandedRot) {
+    public synchronized void setPeriodicIO(double demandedThrottle, double demandedRot) {
         mPeriodicIO.mDemandedThrottle = demandedThrottle;
         mPeriodicIO.mDemandedRot = demandedRot;
 
@@ -91,7 +91,11 @@ public class Drivetrain implements ISubsystem {
             @Override
             public void onLoop(double timestamp) {
                 // TODO Auto-generated method stub
-                cartersianDrive();
+                synchronized(this) {
+                    cartersianDrive();
+
+                }
+                
 
             }
         });

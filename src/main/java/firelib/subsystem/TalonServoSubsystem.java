@@ -10,6 +10,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
  */
 public abstract class TalonServoSubsystem implements ISubsystem {
     protected TalonSRX mServoMotor;
+    protected double mServoAngle;
 
     protected TalonServoSubsystem(TalonSRX servoMotor) {
         mServoMotor = servoMotor;

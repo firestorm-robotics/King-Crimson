@@ -57,7 +57,9 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+    mDisabledLooper.stop();
     mEnabledLooper.start();
+    
   }
 
   @Override
@@ -67,10 +69,10 @@ public class Robot extends TimedRobot {
     boolean wantsShoot = mControls.getShoot();
 
     if(wantsShoot) {
-      mShooter.setIO(0,4500);
+      mShooter.setIO(1,3000);
       mShooter.setState(ShooterStates.SPINNING_UP);
     } else {
-      mShooter.setIO(0,0);
+      mShooter.setIO(0,3000);
       mShooter.setState(ShooterStates.IDLE);
     }
 
