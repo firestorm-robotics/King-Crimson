@@ -1,4 +1,4 @@
-package firelib.actions;
+package firelib.auto.actions;
 
 public interface IAction {
     public void init();

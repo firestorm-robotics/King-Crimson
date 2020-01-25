@@ -13,6 +13,8 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import firelib.looper.Looper;
 import frc.controls.ControlBoard;
+import frc.subsystems.Shooter;
+import frc.subsystems.Shooter.ShooterStates;
 /**
  * The VM is configured to automatically run this class, and to call the
  * functions corresponding to each mode, as described in the TimedRobot
@@ -28,7 +30,8 @@ public class Robot extends TimedRobot {
   private Looper mDisabledLooper = new Looper();
   private ControlBoard mControls = ControlBoard.getInstance();
   private Drivetrain mDrivetrain = Drivetrain.getInstance();
-  private final SubsystemManager mSubsystemManager = new SubsystemManager(Arrays.asList(mDrivetrain));
+  private Shooter mShooter = Shooter.getInstance();
+  private final SubsystemManager mSubsystemManager = new SubsystemManager(Arrays.asList(mDrivetrain, mShooter));
 
   @Override
   public void robotInit() {
@@ -54,15 +57,25 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+    mDisabledLooper.stop();
     mEnabledLooper.start();
+
   }
 
   @Override
   public void teleopPeriodic() {
-    double throttle = KingMathUtils.clampD(mControls.getYThrottle(),0.075);
-    double rot = KingMathUtils.clampD(mControls.getXThrottle(),0.075);
-    SmartDashboard.putNumber("y",throttle);
-    SmartDashboard.putNumber("x",rot);
+    double throttle = KingMathUtils.clampD(mControls.getYThrottle(), 0.075);
+    double rot = KingMathUtils.clampD(mControls.getXThrottle(), 0.075);
+    boolean wantsShoot = mControls.getShoot();
+
+    if (wantsShoot) {
+      mShooter.setIO(1, 3000);
+      mShooter.setState(ShooterStates.SPINNING_UP);
+    } else {
+      mShooter.setIO(0, 3000);
+      mShooter.setState(ShooterStates.IDLE);
+    }
+
     mDrivetrain.setPeriodicIO(-KingMathUtils.logit(-throttle), -KingMathUtils.turnExp(-rot));
   }
 

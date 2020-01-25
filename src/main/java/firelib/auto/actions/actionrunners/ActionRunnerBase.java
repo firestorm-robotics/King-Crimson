@@ -1,6 +1,6 @@
-package firelib.actions.actionrunners;
+package firelib.auto.actions.actionrunners;
 
-import firelib.actions.IAction;
+import firelib.auto.actions.IAction;
 
 public abstract class ActionRunnerBase {
     protected boolean isActive = false;
