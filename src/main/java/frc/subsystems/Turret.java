@@ -14,7 +14,6 @@ public class Turret extends TalonServoSubsystem {
         OPEN_LOOP(), POSITION_CLOSE_LOOP(), ANGULAR_VELOCITY_OPEN_LOOP()
     }
 
-    private PeriodicIO mPeriodicIO = new PeriodicIO();
 
     private static Turret instance;
 
