@@ -134,7 +134,7 @@ public class Shooter implements ISubsystem {
         
             @Override
             public void onStart(double timestamp) {
-                
+                set(0);
                 
             }
         

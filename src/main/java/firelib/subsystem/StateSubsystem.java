@@ -1,4 +1,5 @@
 package firelib.subsystem;
+
 import java.util.concurrent.ConcurrentHashMap;
 
 import firelib.statecontrol.*;

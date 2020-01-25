@@ -39,7 +39,7 @@ public class KingMathUtils {
     }
 
     public static double applyDeadband(double x, double lowerBound, double upperbound, double nominalValue) {
-        if(Math.abs(x) > nominalValue - lowerBound && Math.abs(x) < nominalValue + upperbound) {
+        if (Math.abs(x) > nominalValue - lowerBound && Math.abs(x) < nominalValue + upperbound) {
             return nominalValue;
         } else {
             return x;

@@ -91,11 +91,10 @@ public class Drivetrain implements ISubsystem {
             @Override
             public void onLoop(double timestamp) {
                 // TODO Auto-generated method stub
-                synchronized(this) {
+                synchronized (this) {
                     cartersianDrive();
 
                 }
-                
 
             }
         });

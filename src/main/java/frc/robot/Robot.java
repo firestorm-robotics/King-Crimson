@@ -31,7 +31,7 @@ public class Robot extends TimedRobot {
   private ControlBoard mControls = ControlBoard.getInstance();
   private Drivetrain mDrivetrain = Drivetrain.getInstance();
   private Shooter mShooter = Shooter.getInstance();
-  private final SubsystemManager mSubsystemManager = new SubsystemManager(Arrays.asList(mDrivetrain,mShooter));
+  private final SubsystemManager mSubsystemManager = new SubsystemManager(Arrays.asList(mDrivetrain, mShooter));
 
   @Override
   public void robotInit() {
@@ -59,23 +59,22 @@ public class Robot extends TimedRobot {
   public void teleopInit() {
     mDisabledLooper.stop();
     mEnabledLooper.start();
-    
+
   }
 
   @Override
   public void teleopPeriodic() {
-    double throttle = KingMathUtils.clampD(mControls.getYThrottle(),0.075);
-    double rot = KingMathUtils.clampD(mControls.getXThrottle(),0.075);
+    double throttle = KingMathUtils.clampD(mControls.getYThrottle(), 0.075);
+    double rot = KingMathUtils.clampD(mControls.getXThrottle(), 0.075);
     boolean wantsShoot = mControls.getShoot();
 
-    if(wantsShoot) {
-      mShooter.setIO(1,3000);
+    if (wantsShoot) {
+      mShooter.setIO(1, 3000);
       mShooter.setState(ShooterStates.SPINNING_UP);
     } else {
-      mShooter.setIO(0,3000);
+      mShooter.setIO(0, 3000);
       mShooter.setState(ShooterStates.IDLE);
     }
-
 
     mDrivetrain.setPeriodicIO(-KingMathUtils.logit(-throttle), -KingMathUtils.turnExp(-rot));
   }

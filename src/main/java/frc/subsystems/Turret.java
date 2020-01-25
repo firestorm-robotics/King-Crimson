@@ -6,7 +6,6 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import firelib.looper.ILooper;
 import firelib.looper.Loop;
-import firelib.subsystem.ISubsystem;
 import firelib.subsystem.TalonServoSubsystem;
 
 public class Turret extends TalonServoSubsystem {
@@ -66,9 +65,6 @@ public class Turret extends TalonServoSubsystem {
 
             @Override
             public void onLoop(double timestamp) {
-                synchronized (this) {
-
-                }
 
             }
         });

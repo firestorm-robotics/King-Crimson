@@ -33,10 +33,8 @@ public class Intake extends StateSubsystem<IntakeState> {
 
     }
 
-
     /**
-     * interface to run intake at desired speed
-     * will not run if intake is stowed
+     * interface to run intake at desired speed will not run if intake is stowed
      */
     public void runIntake() {
         mIntake.set(ControlMode.PercentOutput, mCurrentState.intakeSpeed());
@@ -92,9 +90,11 @@ public class Intake extends StateSubsystem<IntakeState> {
 
     @Override
     protected void update() {
-        if (KingMathUtils.applyDeadband(mCurrentAngle, 50, 50, mDesiredState.intakeAngle()) != mDesiredState.intakeAngle()) {
+        if (KingMathUtils.applyDeadband(mCurrentAngle, 50, 50, mDesiredState.intakeAngle()) != mDesiredState
+                .intakeAngle()) {
             mIntakeAngle.set(ControlMode.MotionMagic, mDesiredState.intakeAngle());
-        } else if (KingMathUtils.applyDeadband(mCurrentAngle, 50, 50, mDesiredState.intakeAngle()) == mDesiredState.intakeAngle()) {
+        } else if (KingMathUtils.applyDeadband(mCurrentAngle, 50, 50, mDesiredState.intakeAngle()) == mDesiredState
+                .intakeAngle()) {
             mCurrentState = mDesiredState;
         }
 

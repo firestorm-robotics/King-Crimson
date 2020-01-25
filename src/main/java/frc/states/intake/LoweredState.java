@@ -1,6 +1,7 @@
 package frc.states.intake;
 
 import frc.robot.Constants;
+
 public class LoweredState extends IntakeState {
 
     @Override
