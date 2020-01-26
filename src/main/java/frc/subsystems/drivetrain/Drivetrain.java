@@ -2,6 +2,9 @@ package frc.subsystems.drivetrain;
 
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import firelib.looper.ILooper;
 import firelib.looper.Loop;
 import firelib.subsystem.ISubsystem;
@@ -35,16 +38,15 @@ public class Drivetrain implements ISubsystem {
 
     }
 
-    public synchronized void setPeriodicIO(double demandedThrottle, double demandedRot) {
+
+    public synchronized void setIO(double demandedThrottle, double demandedRot) {
         mPeriodicIO.mDemandedThrottle = demandedThrottle;
         mPeriodicIO.mDemandedRot = demandedRot;
-
     }
-
     /**
      * basic drive code for early testing
      */
-    public void cartersianDrive() {
+    public synchronized void cartersianDrive() {
         DriveSignal signal = kinematics.toWheelSpeeds(mPeriodicIO.mDemandedThrottle, mPeriodicIO.mDemandedRot);
         mMotorBase.setVelocity(signal.getLeftSpeed(), signal.getRightSpeed());
     }
@@ -52,7 +54,7 @@ public class Drivetrain implements ISubsystem {
     /**
      * interface for curvature driving untested
      */
-    public void curvatureDrive() {
+    public synchronized void curvatureDrive() {
         DriveSignal signal = kinematics.toCurveWheelSpeeds(mPeriodicIO.mDemandedThrottle, mPeriodicIO.mDemandedRot);
         mMotorBase.setVelocity(signal.getLeftSpeed(), signal.getRightSpeed());
     }
@@ -60,7 +62,7 @@ public class Drivetrain implements ISubsystem {
     @Override
     public void updateSmartDashboard() {
         // TODO Auto-generated method stub
-
+        SmartDashboard.putNumber("Drivetrain Speed", mPeriodicIO.mDemandedThrottle);
     }
 
     @Override
@@ -91,9 +93,8 @@ public class Drivetrain implements ISubsystem {
             @Override
             public void onLoop(double timestamp) {
                 // TODO Auto-generated method stub
-                synchronized (this) {
+                synchronized (Drivetrain.this) {
                     cartersianDrive();
-
                 }
 
             }

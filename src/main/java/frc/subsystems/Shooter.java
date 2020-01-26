@@ -64,7 +64,7 @@ public class Shooter implements ISubsystem {
         mShooterLeft.setInverted(true);
     }
 
-    public void setState(ShooterStates state) {
+    public synchronized void setState(ShooterStates state) {
         mDesiredState = state;
     }
 
@@ -140,7 +140,7 @@ public class Shooter implements ISubsystem {
         
             @Override
             public void onLoop(double timestamp) {
-                synchronized(this) {
+                synchronized(Shooter.this) {
                     if(mDesiredState != ShooterStates.IDLE) {
                         handleCloseLoop();
                     } else {
@@ -150,6 +150,7 @@ public class Shooter implements ISubsystem {
                     if(mPeriodicIO.mCurrentLeftSpd == 0 && mPeriodicIO.mCurrentRightSpd == 0) {
                         mCurrentState = ShooterStates.IDLE;
                     }
+
                 }
                 
 

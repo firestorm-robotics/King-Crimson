@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import firelib.looper.Looper;
 import frc.controls.ControlBoard;
 import frc.subsystems.Shooter;
+import frc.subsystems.Turret;
 import frc.subsystems.Shooter.ShooterStates;
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -31,12 +32,14 @@ public class Robot extends TimedRobot {
   private ControlBoard mControls = ControlBoard.getInstance();
   private Drivetrain mDrivetrain = Drivetrain.getInstance();
   private Shooter mShooter = Shooter.getInstance();
-  private final SubsystemManager mSubsystemManager = new SubsystemManager(Arrays.asList(mDrivetrain, mShooter));
+  private Turret mTurret = Turret.getInstance();
+  private final SubsystemManager mSubsystemManager = new SubsystemManager(Arrays.asList(mDrivetrain, mShooter,mTurret));
 
   @Override
   public void robotInit() {
     mSubsystemManager.registerEnabledLoops(mEnabledLooper);
     mSubsystemManager.registerDisabledLoops(mDisabledLooper);
+    mTurret.resetEncoder();
   }
 
   @Override
@@ -67,16 +70,29 @@ public class Robot extends TimedRobot {
     double throttle = KingMathUtils.clampD(mControls.getYThrottle(), 0.075);
     double rot = KingMathUtils.clampD(mControls.getXThrottle(), 0.075);
     boolean wantsShoot = mControls.getShoot();
+    boolean turnTurretLeft = mControls.getTurnTurretLeft();
+    boolean turnTurretRight = mControls.getTurnTurretRight();
 
     if (wantsShoot) {
       mShooter.setIO(1, 3000);
       mShooter.setState(ShooterStates.SPINNING_UP);
     } else {
-      mShooter.setIO(0, 3000);
+      mShooter.setIO(0, 0);
       mShooter.setState(ShooterStates.IDLE);
     }
 
-    mDrivetrain.setPeriodicIO(-KingMathUtils.logit(-throttle), -KingMathUtils.turnExp(-rot));
+    if(turnTurretLeft) {
+      mTurret.turnLeft();
+    }else if(turnTurretRight) {
+      mTurret.turnRight();
+    }else {
+      mTurret.stop();
+    }
+
+    SmartDashboard.putNumber("POV",mControls.getPOV());
+
+
+    mDrivetrain.setIO(-KingMathUtils.logit(-throttle), -KingMathUtils.turnExp(-rot));
   }
 
   @Override

@@ -35,4 +35,17 @@ public class ControlBoard implements IButtonControlBoard, IJoystickControlBoard 
         return mInstance;
     }
 
+    @Override
+    public boolean getTurnTurretLeft() {
+        return (mDriveController.getPOV() == 90);
+    }
+
+    @Override
+    public boolean getTurnTurretRight() {
+        return (mDriveController.getPOV() == 270);
+    }
+
+    public int getPOV(){
+        return mDriveController.getPOV();
+    }
 }
