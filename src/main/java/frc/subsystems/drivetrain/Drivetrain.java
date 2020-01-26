@@ -11,10 +11,15 @@ import firelib.subsystem.ISubsystem;
 import frc.robot.RobotMap;
 
 public class Drivetrain implements ISubsystem {
+
+    public enum ControlType{
+        OPEN_LOOP, POSITION_CLOSED_LOOP, TRAJECTORY_FOLLOWING;
+    }
     private static Drivetrain instance;
     private PeriodicIO mPeriodicIO = new PeriodicIO();
     private MotorBase mMotorBase;
     private Kinematics kinematics = new Kinematics(0.508, 3.6);
+    private ControlType mControlType = ControlType.OPEN_LOOP;
 
     /**
      * singleton method for use throughout the robot
@@ -44,30 +49,35 @@ public class Drivetrain implements ISubsystem {
         mPeriodicIO.mDemandedRot = demandedRot;
     }
     /**
-     * basic drive code for early testing
+     * basic drive code for normal use
      */
-    public synchronized void cartersianDrive() {
+    private synchronized void cartersianDrive() {
         DriveSignal signal = kinematics.toWheelSpeeds(mPeriodicIO.mDemandedThrottle, mPeriodicIO.mDemandedRot);
         mMotorBase.setVelocity(signal.getLeftSpeed(), signal.getRightSpeed());
     }
 
     /**
-     * interface for curvature driving untested
+     * drives the robot in openloop mode 
      */
-    public synchronized void curvatureDrive() {
-        DriveSignal signal = kinematics.toCurveWheelSpeeds(mPeriodicIO.mDemandedThrottle, mPeriodicIO.mDemandedRot);
-        mMotorBase.setVelocity(signal.getLeftSpeed(), signal.getRightSpeed());
+    private synchronized void handleOpenLoop() {
+        cartersianDrive();
+    }
+
+    /**
+     * drives the robot in some fashion of closed loop mode
+     * depending on if its just positon or trajectory
+     */
+    private synchronized void handleClosedLoop() {
+        //TODO add logic here
     }
 
     @Override
     public void updateSmartDashboard() {
-        // TODO Auto-generated method stub
         SmartDashboard.putNumber("Drivetrain Speed", mPeriodicIO.mDemandedThrottle);
     }
 
     @Override
     public void pollTelemetry() {
-        // TODO Auto-generated method stub
         mPeriodicIO.mLeftVel = 0;
         mPeriodicIO.mRightVel = 0;
 
@@ -94,7 +104,11 @@ public class Drivetrain implements ISubsystem {
             public void onLoop(double timestamp) {
                 // TODO Auto-generated method stub
                 synchronized (Drivetrain.this) {
-                    cartersianDrive();
+                    if(mControlType != ControlType.POSITION_CLOSED_LOOP || mControlType != ControlType.TRAJECTORY_FOLLOWING) {
+                        handleOpenLoop();
+                    } else {
+                        handleClosedLoop();
+                    }
                 }
 
             }

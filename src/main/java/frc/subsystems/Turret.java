@@ -61,7 +61,7 @@ public class Turret extends TalonServoSubsystem {
     /**
      * stops the turret
      */
-    public synchronized void stop() {
+    private synchronized void stop() {
         mPeriodicIO.mDesiredSpeed = 0;
     }
 
@@ -103,6 +103,7 @@ public class Turret extends TalonServoSubsystem {
             @Override
             public void onStop(double timestamp) {
                 // TODO Auto-generated method stub
+                stop();
 
             }
 

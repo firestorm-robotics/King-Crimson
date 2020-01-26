@@ -33,7 +33,8 @@ public class Robot extends TimedRobot {
   private Drivetrain mDrivetrain = Drivetrain.getInstance();
   private Shooter mShooter = Shooter.getInstance();
   private Turret mTurret = Turret.getInstance();
-  private final SubsystemManager mSubsystemManager = new SubsystemManager(Arrays.asList(mDrivetrain, mShooter,mTurret));
+  private final SubsystemManager mSubsystemManager = new SubsystemManager(
+      Arrays.asList(mDrivetrain, mShooter, mTurret));
 
   @Override
   public void robotInit() {
@@ -69,11 +70,13 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     double throttle = KingMathUtils.clampD(mControls.getYThrottle(), 0.075);
     double rot = KingMathUtils.clampD(mControls.getXThrottle(), 0.075);
-    boolean wantsShoot = mControls.getShoot();
-    boolean turnTurretLeft = mControls.getTurnTurretLeft();
-    boolean turnTurretRight = mControls.getTurnTurretRight();
 
-    if (wantsShoot) {
+    boolean wantsShot = mControls.getShoot();
+
+    boolean wanstToTurnTurretLeft = mControls.getTurnTurretLeft();
+    boolean wantsToTurnTurretRight = mControls.getTurnTurretRight();
+
+    if (wantsShot) {
       mShooter.setIO(1, 3000);
       mShooter.setState(ShooterStates.SPINNING_UP);
     } else {
@@ -81,16 +84,13 @@ public class Robot extends TimedRobot {
       mShooter.setState(ShooterStates.IDLE);
     }
 
-    if(turnTurretLeft) {
-      mTurret.turnLeft();
-    }else if(turnTurretRight) {
-      mTurret.turnRight();
-    }else {
-      mTurret.stop();
+    if (wanstToTurnTurretLeft) {
+      mTurret.setOpenloopPower(1);
+    } else if (wantsToTurnTurretRight) {
+      mTurret.setOpenloopPower(-1);
+    } else {
+      mTurret.setOpenloopPower(0);
     }
-
-    SmartDashboard.putNumber("POV",mControls.getPOV());
-
 
     mDrivetrain.setIO(-KingMathUtils.logit(-throttle), -KingMathUtils.turnExp(-rot));
   }
