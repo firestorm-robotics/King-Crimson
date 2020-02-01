@@ -55,14 +55,15 @@ public class Shooter implements ISubsystem {
         mLeftEncoder  = mShooterLeft.getEncoder();
         mRightEncoder = mShooterRight.getEncoder();
 
-        mLeftPID.setP(0.0015);
-        mRightPID.setP(0.002);
-        mLeftPID.setP(0.00015);
-        mRightPID.setP(0.0002);
-        mLeftPID.setFF(0.00009804);
-        mRightPID.setFF(0.0001);
+        mLeftPID.setP(0.00011494*2);
+        mRightPID.setP(0.00010526*2);
+        mLeftPID.setD(0.00057471*3);
+        mRightPID.setD(0.00052632*3);
+        mLeftPID.setFF(0.00011494);
+        mRightPID.setFF(0.00010526);
 
         mShooterLeft.setInverted(true);
+        mShooterRight.setInverted(true);
     }
 
     public synchronized void setState(ShooterStates state) {
@@ -75,7 +76,7 @@ public class Shooter implements ISubsystem {
      */
     private void set(double percent) {
         mLeftPID.setReference(percent, ControlType.kDutyCycle);
-        mRightPID.setReference(-percent, ControlType.kDutyCycle);
+        mRightPID.setReference(percent, ControlType.kDutyCycle);
     }
 
     /**
@@ -84,7 +85,7 @@ public class Shooter implements ISubsystem {
      */
     private void setRPM(double rpm) {
         mLeftPID.setReference(rpm, ControlType.kVelocity);
-        mRightPID.setReference(rpm, ControlType.kVelocity);
+        mRightPID.setReference(-rpm, ControlType.kVelocity);
     }
 
     public void stop() {
@@ -135,11 +136,12 @@ public class Shooter implements ISubsystem {
 
     @Override
     public void updateSmartDashboard() {
-        SmartDashboard.putNumber("Shooter Left RPM", (mPeriodicIO.mCurrentLeftSpd/4096)*600);
-        SmartDashboard.putNumber("Shooter Right RPM", (mPeriodicIO.mCurrentRightSpd/4096)*600);
+        SmartDashboard.putNumber("Shooter Left RPM", (mPeriodicIO.mCurrentLeftSpd/3));
+        SmartDashboard.putNumber("Shooter Right RPM", (mPeriodicIO.mCurrentRightSpd/3));
         SmartDashboard.putNumber("Motor Left RPM", mPeriodicIO.mCurrentLeftSpd);
         SmartDashboard.putNumber("Motor Right RPM", mPeriodicIO.mCurrentRightSpd);
         SmartDashboard.putNumber("Shooter Demanded RPM", mPeriodicIO.mDemandedRPM);
+        SmartDashboard.putString("Shooter state",(mCurrentState == ShooterStates.OPEN_LOOP ? "Open loop" : "not open loop"));
 
     }
 
@@ -169,7 +171,7 @@ public class Shooter implements ISubsystem {
             @Override
             public void onLoop(double timestamp) {
                 synchronized(Shooter.this) {
-                    if(mDesiredState != ShooterStates.IDLE) {
+                    if(mDesiredState != ShooterStates.IDLE && mDesiredState != ShooterStates.OPEN_LOOP) {
                         handleCloseLoop();
                     } else if(mDesiredState == ShooterStates.OPEN_LOOP) {
                         handleOpenLoop();

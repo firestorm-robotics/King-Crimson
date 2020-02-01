@@ -1,17 +1,20 @@
 package frc.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import firelib.looper.ILooper;
 import firelib.looper.Loop;
 import firelib.subsystem.TalonServoSubsystem;
 
+/**
+ * implementation to control the turret on the robot
+ * multiple control loops depending if it needs to lock position or follow target
+ */
 public class Turret extends TalonServoSubsystem {
 
     public enum ControlType {
-        OPEN_LOOP(), POSITION_CLOSED_LOOP(), VELOCITY_CLOSED_LOOP()
+        OPEN_LOOP(), POSITION_CLOSED_LOOP(), VELOCITY_CLOSED_LOOP(), VELOCITY_OPEN_LOOP;
     }
 
     private ControlType mControlType = ControlType.OPEN_LOOP;
@@ -27,10 +30,6 @@ public class Turret extends TalonServoSubsystem {
 
     protected Turret(TalonSRX servoMotor) {
         super(servoMotor);
-        mServoMotor.configSelectedFeedbackSensor(FeedbackDevice.PulseWidthEncodedPosition);
-        mServoMotor.config_kF(0, 3.069);
-        mServoMotor.configMotionCruiseVelocity(220);
-        mServoMotor.configMotionAcceleration(175);
         // TODO Auto-generated constructor stub
     }
 
@@ -59,6 +58,14 @@ public class Turret extends TalonServoSubsystem {
     }
 
     /**
+     * sets the control type of the turret
+     * @param type type of control loop for the turret
+     */
+    public synchronized void setControlType(ControlType type) {
+        mControlType = type;
+    }
+
+    /**
      * stops the turret
      */
     private synchronized void stop() {
@@ -71,7 +78,10 @@ public class Turret extends TalonServoSubsystem {
     private void handleClosedLoop() {
         // Right now we just have position control
         // TODO Maybe add velocity control
-        setPos(mPeriodicIO.mDesiredAngle);
+        if(mControlType == ControlType.POSITION_CLOSED_LOOP) {
+            setPos(mPeriodicIO.mDesiredAngle);
+        } else if(mControlType == ControlType.VELOCITY_CLOSED_LOOP) {
+        }
     }
 
     /**

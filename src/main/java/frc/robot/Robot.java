@@ -31,16 +31,15 @@ public class Robot extends TimedRobot {
   private Looper mDisabledLooper = new Looper();
   private ControlBoard mControls = ControlBoard.getInstance();
   private Drivetrain mDrivetrain = Drivetrain.getInstance();
-  private Shooter mShooter = Shooter.getInstance();
-  private Turret mTurret = Turret.getInstance();
+  //private Shooter mShooter = Shooter.getInstance();
+  //private Turret mTurret = Turret.getInstance();
   private final SubsystemManager mSubsystemManager = new SubsystemManager(
-      Arrays.asList(mDrivetrain, mShooter, mTurret));
+      Arrays.asList(mDrivetrain));
 
   @Override
   public void robotInit() {
     mSubsystemManager.registerEnabledLoops(mEnabledLooper);
     mSubsystemManager.registerDisabledLoops(mDisabledLooper);
-    mTurret.resetEncoder();
   }
 
   @Override
@@ -76,8 +75,8 @@ public class Robot extends TimedRobot {
     boolean wanstToTurnTurretLeft = mControls.getTurnTurretLeft();
     boolean wantsToTurnTurretRight = mControls.getTurnTurretRight();
 
-    if (wantsShot) {
-      mShooter.setIO(1, 3000);
+    /*if (wantsShot) {
+      mShooter.setIO(-1*throttle, 11000*-throttle);
       mShooter.setState(ShooterStates.SPINNING_UP);
     } else {
       mShooter.setIO(0, 0);
@@ -90,9 +89,13 @@ public class Robot extends TimedRobot {
       mTurret.setOpenloopPower(-1);
     } else {
       mTurret.setOpenloopPower(0);
-    }
+    }*/
 
-    mDrivetrain.setIO(-KingMathUtils.logit(-throttle), -KingMathUtils.turnExp(-rot));
+    if (!wantsShot) {
+      mDrivetrain.setIO(KingMathUtils.logit(-throttle*0.7), -KingMathUtils.turnExp(rot*0.5));
+    } else {
+      mDrivetrain.setIO(0,0);
+    }
   }
 
   @Override

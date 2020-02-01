@@ -1,7 +1,5 @@
 package frc.subsystems.drivetrain;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
 public class Kinematics {
     private final double mTrackWidth;
     private final double mMaxOmega;

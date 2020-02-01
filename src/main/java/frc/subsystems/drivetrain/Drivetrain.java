@@ -1,9 +1,9 @@
 package frc.subsystems.drivetrain;
 
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.kauailabs.navx.frc.AHRS;
 
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.I2C.Port;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import firelib.looper.ILooper;
 import firelib.looper.Loop;
@@ -18,7 +18,8 @@ public class Drivetrain implements ISubsystem {
     private static Drivetrain instance;
     private PeriodicIO mPeriodicIO = new PeriodicIO();
     private MotorBase mMotorBase;
-    private Kinematics kinematics = new Kinematics(0.508, 3.6);
+    private Kinematics kinematics = new Kinematics(0.6096, 7.8);
+    private AHRS mGyro = new AHRS(Port.kMXP);
     private ControlType mControlType = ControlType.OPEN_LOOP;
 
     /**
@@ -28,9 +29,9 @@ public class Drivetrain implements ISubsystem {
      */
     public static Drivetrain getInstance() {
         if (instance == null) {
-            instance = new Drivetrain(new TalonSRX(RobotMap.DRIVETRAIN_LEFT_MASTER),
-                    new TalonSRX(RobotMap.DRIVETRAIN_RIGHT_MASTER), new VictorSPX(RobotMap.DRIVETRAIN_LEFT_SLAVE),
-                    new VictorSPX(RobotMap.DRIVETRAIN_RIGHT_SLAVE));
+            instance = new Drivetrain(new TalonFX(RobotMap.DRIVETRAIN_LEFT_MASTER),
+                    new TalonFX(RobotMap.DRIVETRAIN_RIGHT_MASTER), new TalonFX(RobotMap.DRIVETRAIN_LEFT_SLAVE),
+                    new TalonFX(RobotMap.DRIVETRAIN_RIGHT_SLAVE));
         }
         return instance;
     }
@@ -38,7 +39,7 @@ public class Drivetrain implements ISubsystem {
     /**
      * ctor -- DO NOT USE -- except for unit testing
      */
-    public Drivetrain(TalonSRX masterLeft, TalonSRX masterRight, VictorSPX slaveLeft, VictorSPX slaveRight) {
+    public Drivetrain(TalonFX masterLeft, TalonFX masterRight, TalonFX slaveLeft, TalonFX slaveRight) {
         mMotorBase = new MotorBase(masterLeft, masterRight, slaveLeft, slaveRight);
 
     }
@@ -74,6 +75,7 @@ public class Drivetrain implements ISubsystem {
     @Override
     public void updateSmartDashboard() {
         SmartDashboard.putNumber("Drivetrain Speed", mPeriodicIO.mDemandedThrottle);
+        SmartDashboard.putNumber("Gyro",-mGyro.getYaw());
     }
 
     @Override
