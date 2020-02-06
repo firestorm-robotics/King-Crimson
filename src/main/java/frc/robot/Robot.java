@@ -10,11 +10,12 @@ package frc.robot;
 import java.util.Arrays;
 
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import firelib.looper.Looper;
 import frc.controls.ControlBoard;
 import frc.subsystems.Shooter;
 import frc.subsystems.Shooter.ShooterStates;
+
+
 /**
  * The VM is configured to automatically run this class, and to call the
  * functions corresponding to each mode, as described in the TimedRobot
@@ -32,7 +33,7 @@ public class Robot extends TimedRobot {
   private Drivetrain mDrivetrain = Drivetrain.getInstance();
   private Shooter mShooter = Shooter.getInstance();
   private final SubsystemManager mSubsystemManager = new SubsystemManager(Arrays.asList(mDrivetrain, mShooter));
-
+  
   @Override
   public void robotInit() {
     mSubsystemManager.registerEnabledLoops(mEnabledLooper);
