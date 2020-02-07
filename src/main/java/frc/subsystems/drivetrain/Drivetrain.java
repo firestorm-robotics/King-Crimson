@@ -1,15 +1,13 @@
 package frc.subsystems.drivetrain;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
-import com.ctre.phoenix.motion.TrajectoryPoint;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.music.Orchestra;
 import com.kauailabs.navx.frc.AHRS;
 
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.I2C.Port;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.controller.RamseteController;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
@@ -27,7 +25,7 @@ import frc.robot.RobotMap;
 public class Drivetrain implements ISubsystem {
 
     public enum ControlType {
-        OPEN_LOOP, POSITION_CLOSED_LOOP, TRAJECTORY_FOLLOWING, LONG_SQUAD;
+        VELOCITY_CLOSED_LOOP, TRAJECTORY_FOLLOWING, LONG_SQUAD;
     }
 
     private static Drivetrain instance;
@@ -50,7 +48,7 @@ public class Drivetrain implements ISubsystem {
      * variables for music playing
      */
     private Orchestra mOrchestra;
-    private ControlType mControlType = ControlType.OPEN_LOOP;
+    private ControlType mControlType = ControlType.VELOCITY_CLOSED_LOOP;
 
     /**
      * singleton method for use throughout the robot
@@ -71,7 +69,6 @@ public class Drivetrain implements ISubsystem {
      */
     public Drivetrain(TalonFX masterLeft, TalonFX masterRight, TalonFX slaveLeft, TalonFX slaveRight) {
         mMotorBase = new MotorBase(masterLeft, masterRight, slaveLeft, slaveRight);
-        ArrayList<TalonFX> list = new ArrayList<TalonFX>();
         mOrchestra = new Orchestra(Arrays.asList(masterLeft, masterRight, slaveLeft, slaveRight));
         mOrchestra.loadMusic("beeg11.chrp");
 
@@ -104,9 +101,9 @@ public class Drivetrain implements ISubsystem {
     }
 
     /**
-     * drives the robot in openloop mode
+     * drives the robot in user control mode via Velocity closed loop
      */
-    private synchronized void handleOpenLoop() {
+    private synchronized void handleUserControl() {
         cartersianDrive();
     }
 
@@ -114,7 +111,7 @@ public class Drivetrain implements ISubsystem {
      * drives the robot in some fashion of closed loop mode depending on if its just
      * positon or trajectory
      */
-    private synchronized void handleClosedLoop() {
+    private synchronized void handleClosedControl() {
         if (mControlType == ControlType.TRAJECTORY_FOLLOWING) {
             mTrajectoryTime = Timer.getFPGATimestamp() - mTimeStamp;
             mTimer.start();
@@ -123,7 +120,7 @@ public class Drivetrain implements ISubsystem {
             DifferentialDriveWheelSpeeds diffSpeeds = mTrajKinematics.toWheelSpeeds(speeds);
             mMotorBase.setVelocity(diffSpeeds.leftMetersPerSecond, diffSpeeds.rightMetersPerSecond);
             if (mTrajectoryTime + mTimeStamp >= mTrajectory.getTotalTimeSeconds() + mTimeStamp) {
-                mControlType = ControlType.OPEN_LOOP;
+                mControlType = ControlType.VELOCITY_CLOSED_LOOP;
             }
         }
         if (mControlType == ControlType.LONG_SQUAD) {
@@ -133,6 +130,15 @@ public class Drivetrain implements ISubsystem {
         }
     }
 
+    /**
+     * takes encoder distances from the left and right sides of the drivetrain and
+     * fuses them w/ the heading to make a reletive (x,y) position for the robot
+     * 
+     * @param leftPos  raw encoder ticks of the left side
+     * @param rightPos raw encoder ticks of the right side
+     * @param angle    angle of the robot should be from -180 to 180 with ccw
+     *                 rotation being positive
+     */
     public void updateOdometry(double leftPos, double rightPos, double angle) {
         var yaw = Rotation2d.fromDegrees(angle);
         var rawLeftRotations = (leftPos / 2048) / 6.54545788;
@@ -171,19 +177,17 @@ public class Drivetrain implements ISubsystem {
 
             @Override
             public void onStart(double timestamp) {
-                mControlType = ControlType.OPEN_LOOP;
+                mControlType = ControlType.VELOCITY_CLOSED_LOOP;
 
             }
 
             @Override
             public void onLoop(double timestamp) {
                 synchronized (Drivetrain.this) {
-                    if (mControlType != ControlType.POSITION_CLOSED_LOOP
-                            && mControlType != ControlType.TRAJECTORY_FOLLOWING
-                            && mControlType != ControlType.LONG_SQUAD) {
-                        handleOpenLoop();
+                    if (mControlType != ControlType.TRAJECTORY_FOLLOWING && mControlType != ControlType.LONG_SQUAD) {
+                        handleUserControl();
                     } else {
-                        handleClosedLoop();
+                        handleClosedControl();
                     }
 
                     updateOdometry(mMotorBase.getLeftPos(), mMotorBase.getRightPos(), -mGyro.getYaw());

@@ -4,23 +4,15 @@ import java.util.ArrayList;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.trajectory.constraint.CentripetalAccelerationConstraint;
-import edu.wpi.first.wpilibj.trajectory.constraint.TrajectoryConstraint;
 import edu.wpi.first.wpilibj.util.Units;
 
 public class SimpleTrajectory {
     private Trajectory mTraj;
     public void generateTrajectory() {
-
-        // 2018 cross scale auto waypoints.
-        var sideStart = new Pose2d(Units.feetToMeters(0), Units.feetToMeters(0),
-            Rotation2d.fromDegrees(-180));
-        var crossScale = new Pose2d(Units.feetToMeters(23.7), Units.feetToMeters(6.8),
-            Rotation2d.fromDegrees(-160));
 
         var start = new Pose2d(Units.feetToMeters(0),Units.feetToMeters(0),Rotation2d.fromDegrees(0));
         var end   = new Pose2d(Units.feetToMeters(24),Units.feetToMeters(6),Rotation2d.fromDegrees(0));
