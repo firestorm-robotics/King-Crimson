@@ -55,14 +55,12 @@ public class Intake extends StateSubsystem<IntakeState> {
 
     @Override
     public void pollTelemetry() {
-        // TODO Auto-generated method stub
         mCurrentAngle = mIntakeAngle.getSelectedSensorPosition();
 
     }
 
     @Override
     public void registerEnabledLoops(ILooper enabledLooper) {
-        // TODO Auto-generated method stub
         enabledLooper.register(new Loop() {
 
             @Override

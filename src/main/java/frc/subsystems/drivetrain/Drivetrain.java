@@ -74,6 +74,11 @@ public class Drivetrain implements ISubsystem {
 
     }
 
+    /**
+     * set demands for user control mode
+     * @param demandedThrottle how fast the robot goes foward as a percentage
+     * @param demandedRot how fast the robot turns as a percentage
+     */
     public synchronized void setIO(double demandedThrottle, double demandedRot) {
         mPeriodicIO.mDemandedThrottle = demandedThrottle;
         mPeriodicIO.mDemandedRot = demandedRot;

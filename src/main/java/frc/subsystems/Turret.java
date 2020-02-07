@@ -53,7 +53,6 @@ public class Turret extends TalonServoSubsystem {
      * @param angle angle of the turret
      */
     public synchronized void setDesiredAngle(double angle) {
-        //TODO figure out conversion rate between angle and encoder ticks
         mPeriodicIO.mDesiredAngle =  (angle * Constants.TURRET_TICK_TO_ANGLE);
     }
 
@@ -92,7 +91,7 @@ public class Turret extends TalonServoSubsystem {
         }
     }
 
-    /**
+    /*
      * sets the TalonSRX to move the motor at the demanded amount of power
      */
     private void handleOpenLoop() {
@@ -115,25 +114,21 @@ public class Turret extends TalonServoSubsystem {
 
     @Override
     public void registerEnabledLoops(ILooper enabledLooper) {
-        // TODO Auto-generated method stub
         enabledLooper.register(new Loop() {
 
             @Override
             public void onStop(double timestamp) {
-                // TODO Auto-generated method stub
                 stop();
 
             }
 
             @Override
             public void onStart(double timestamp) {
-                // TODO Auto-generated method stub
-
+                mControlType = ControlType.OPEN_LOOP;
             }
 
             @Override
             public void onLoop(double timestamp) {
-                // TODO add stuff later
                 synchronized (Turret.this) {
                     if (mControlType != ControlType.POSITION_CLOSED_LOOP) {
                         handleOpenLoop();
