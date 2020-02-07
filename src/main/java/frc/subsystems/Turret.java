@@ -88,6 +88,7 @@ public class Turret extends TalonServoSubsystem {
         if(mControlType == ControlType.POSITION_CLOSED_LOOP) {
             setPos(mPeriodicIO.mDesiredAngle);
         } else if(mControlType == ControlType.VELOCITY_CLOSED_LOOP) {
+            //TODO maybe add velocity control
         }
     }
 

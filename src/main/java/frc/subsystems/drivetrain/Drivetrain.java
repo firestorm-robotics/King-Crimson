@@ -31,7 +31,7 @@ public class Drivetrain implements ISubsystem {
     private static Drivetrain instance;
     private PeriodicIO mPeriodicIO = new PeriodicIO();
     private MotorBase mMotorBase;
-    private fireKinematics kinematics = new fireKinematics(0.6096, 7.8);
+    private FireKinematics kinematics = new FireKinematics(0.6096, 7.8);
     /**
      * variables for trajectory following
      */
@@ -76,8 +76,9 @@ public class Drivetrain implements ISubsystem {
 
     /**
      * set demands for user control mode
+     * 
      * @param demandedThrottle how fast the robot goes foward as a percentage
-     * @param demandedRot how fast the robot turns as a percentage
+     * @param demandedRot      how fast the robot turns as a percentage
      */
     public synchronized void setIO(double demandedThrottle, double demandedRot) {
         mPeriodicIO.mDemandedThrottle = demandedThrottle;
@@ -128,10 +129,9 @@ public class Drivetrain implements ISubsystem {
                 mControlType = ControlType.VELOCITY_CLOSED_LOOP;
             }
         }
-        if (mControlType == ControlType.LONG_SQUAD) {
-            if (!mOrchestra.isPlaying()) {
-                mOrchestra.play();
-            }
+        if (mControlType == ControlType.LONG_SQUAD && !mOrchestra.isPlaying()) {
+
+            mOrchestra.play();
         }
     }
 

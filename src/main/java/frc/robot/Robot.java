@@ -10,13 +10,10 @@ package frc.robot;
 import java.util.Arrays;
 
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import firelib.looper.Looper;
 import frc.controls.ControlBoard;
-import frc.subsystems.Shooter;
 import frc.subsystems.Turret;
-import frc.subsystems.Shooter.ShooterStates;
 /**
  * The VM is configured to automatically run this class, and to call the
  * functions corresponding to each mode, as described in the TimedRobot
@@ -82,7 +79,6 @@ public class Robot extends TimedRobot {
     boolean wanstToTurnTurretLeft = mControls.getTurnTurretLeft();
     boolean wantsToTurnTurretRight = mControls.getTurnTurretRight();
 
-    boolean wantsToFollowTrajectory = mControls.initalizeTrajectory();
     boolean wantsToTurnTurret = mControls.getEnableTrajectory();
     /*if (wantsShot) {
       mShooter.setIO(-1*throttle, 11000*-throttle);
