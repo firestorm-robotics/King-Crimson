@@ -1,5 +1,0 @@
-CANCoder:
-  Defaults: "CustomComponent,None"
-  ClassName: "CANCoder"
-  Construction: "#variable($Name) = new ${ClassName}($CAN_ID);"
-  Import: "import com.ctre.phoenix.sensors.CANCoder;"
