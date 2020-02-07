@@ -21,7 +21,7 @@ public abstract class TalonServoSubsystem implements ISubsystem {
      * 
      * @param tickPos the tick position for the encoder
      */
-    protected synchronized void setPos(int tickPos) {
+    protected synchronized void setPos(double tickPos) {
         mServoMotor.set(ControlMode.MotionMagic, tickPos);
     }
 
