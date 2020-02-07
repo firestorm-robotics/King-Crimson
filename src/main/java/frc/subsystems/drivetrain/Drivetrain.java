@@ -26,9 +26,10 @@ import frc.robot.RobotMap;
 
 public class Drivetrain implements ISubsystem {
 
-    public enum ControlType{
+    public enum ControlType {
         OPEN_LOOP, POSITION_CLOSED_LOOP, TRAJECTORY_FOLLOWING, LONG_SQUAD;
     }
+
     private static Drivetrain instance;
     private PeriodicIO mPeriodicIO = new PeriodicIO();
     private MotorBase mMotorBase;
@@ -38,7 +39,8 @@ public class Drivetrain implements ISubsystem {
      */
     private DifferentialDriveKinematics mTrajKinematics = new DifferentialDriveKinematics(0.6096);
     private AHRS mGyro = new AHRS(Port.kMXP);
-    private DifferentialDriveOdometry mOdometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(-mGyro.getYaw()));
+    private DifferentialDriveOdometry mOdometry = new DifferentialDriveOdometry(
+            Rotation2d.fromDegrees(-mGyro.getYaw()));
     private RamseteController mController = new RamseteController();
     private Trajectory mTrajectory;
     private Timer mTimer = new Timer();
@@ -70,11 +72,10 @@ public class Drivetrain implements ISubsystem {
     public Drivetrain(TalonFX masterLeft, TalonFX masterRight, TalonFX slaveLeft, TalonFX slaveRight) {
         mMotorBase = new MotorBase(masterLeft, masterRight, slaveLeft, slaveRight);
         ArrayList<TalonFX> list = new ArrayList<TalonFX>();
-        mOrchestra = new Orchestra(Arrays.asList(masterLeft,masterRight,slaveLeft,slaveRight));
+        mOrchestra = new Orchestra(Arrays.asList(masterLeft, masterRight, slaveLeft, slaveRight));
         mOrchestra.loadMusic("beeg11.chrp");
 
     }
-
 
     public synchronized void setIO(double demandedThrottle, double demandedRot) {
         mPeriodicIO.mDemandedThrottle = demandedThrottle;
@@ -92,42 +93,55 @@ public class Drivetrain implements ISubsystem {
     public synchronized void setControlType(ControlType type) {
         mControlType = type;
     }
+
     /**
      * basic drive code for normal use
      */
     private synchronized void cartersianDrive() {
         DriveSignal signal = kinematics.toWheelSpeeds(mPeriodicIO.mDemandedThrottle, mPeriodicIO.mDemandedRot);
-        mMotorBase.setVelocity(signal.getLeftSpeed()*Units.feetToMeters(25.6), signal.getRightSpeed()*Units.feetToMeters(25.6));
+        mMotorBase.setVelocity(signal.getLeftSpeed() * Units.feetToMeters(25.6),
+                signal.getRightSpeed() * Units.feetToMeters(25.6));
     }
 
     /**
-     * drives the robot in openloop mode 
+     * drives the robot in openloop mode
      */
     private synchronized void handleOpenLoop() {
         cartersianDrive();
     }
 
     /**
-     * drives the robot in some fashion of closed loop mode
-     * depending on if its just positon or trajectory
+     * drives the robot in some fashion of closed loop mode depending on if its just
+     * positon or trajectory
      */
     private synchronized void handleClosedLoop() {
-        if(mControlType == ControlType.TRAJECTORY_FOLLOWING) {
+        if (mControlType == ControlType.TRAJECTORY_FOLLOWING) {
             mTrajectoryTime = Timer.getFPGATimestamp() - mTimeStamp;
             mTimer.start();
             Trajectory.State goal = mTrajectory.sample(mTrajectoryTime);
             ChassisSpeeds speeds = mController.calculate(mOdometry.getPoseMeters(), goal);
             DifferentialDriveWheelSpeeds diffSpeeds = mTrajKinematics.toWheelSpeeds(speeds);
             mMotorBase.setVelocity(diffSpeeds.leftMetersPerSecond, diffSpeeds.rightMetersPerSecond);
-            if(mTrajectoryTime+mTimeStamp >= mTrajectory.getTotalTimeSeconds()+mTimeStamp) {
+            if (mTrajectoryTime + mTimeStamp >= mTrajectory.getTotalTimeSeconds() + mTimeStamp) {
                 mControlType = ControlType.OPEN_LOOP;
             }
         }
-        if(mControlType == ControlType.LONG_SQUAD) {
-            if(!mOrchestra.isPlaying()) {
+        if (mControlType == ControlType.LONG_SQUAD) {
+            if (!mOrchestra.isPlaying()) {
                 mOrchestra.play();
             }
         }
+    }
+
+    public void updateOdometry(double leftPos, double rightPos, double angle) {
+        var yaw = Rotation2d.fromDegrees(angle);
+        var rawLeftRotations = (leftPos / 2048) / 6.54545788;
+        var rawRightRotations = rightPos / 2048 / 6.54545788;
+
+        var leftDistanceMeters = rawLeftRotations * (Math.PI * 2 * (Units.inchesToMeters(3)));
+        var rightDistanceMeters = rawRightRotations * (Math.PI * 2 * (Units.inchesToMeters(3)));
+        mOdometry.update(yaw, leftDistanceMeters, rightDistanceMeters);
+
     }
 
     @Override
@@ -163,21 +177,16 @@ public class Drivetrain implements ISubsystem {
 
             @Override
             public void onLoop(double timestamp) {
-                // TODO Auto-generated method stub
                 synchronized (Drivetrain.this) {
-                    //update odometry
-                    var angle             = Rotation2d.fromDegrees(-mGyro.getYaw());
-                    var rawLeftRotations  = (mMotorBase.getLeftPos()/2048)/6.54545788;
-                    var rawRightRotations = mMotorBase.getRightPos()/2048/6.54545788;
-
-                    var leftDistanceMeters  = rawLeftRotations*(Math.PI*2*(Units.inchesToMeters(3)));
-                    var rightDistanceMeters = rawRightRotations*(Math.PI*2*(Units.inchesToMeters(3)));
-                    mOdometry.update(Rotation2d.fromDegrees(-mGyro.getYaw()), leftDistanceMeters, rightDistanceMeters);
-                    if(mControlType != ControlType.POSITION_CLOSED_LOOP && mControlType != ControlType.TRAJECTORY_FOLLOWING && mControlType != ControlType.LONG_SQUAD) {
+                    if (mControlType != ControlType.POSITION_CLOSED_LOOP
+                            && mControlType != ControlType.TRAJECTORY_FOLLOWING
+                            && mControlType != ControlType.LONG_SQUAD) {
                         handleOpenLoop();
                     } else {
                         handleClosedLoop();
                     }
+
+                    updateOdometry(mMotorBase.getLeftPos(), mMotorBase.getRightPos(), -mGyro.getYaw());
                 }
 
             }

@@ -31,7 +31,6 @@ public class Turret extends TalonServoSubsystem {
 
     protected Turret(TalonSRX servoMotor) {
         super(servoMotor);
-        // TODO Auto-generated constructor stub
         mServoMotor.setInverted(false);
         mServoMotor.config_kF(0,2.9416666666666667);
         mServoMotor.configMotionCruiseVelocity(210);
