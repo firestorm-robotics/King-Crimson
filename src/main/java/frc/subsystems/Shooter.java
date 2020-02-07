@@ -55,8 +55,8 @@ public class Shooter implements ISubsystem {
         mLeftEncoder  = mShooterLeft.getEncoder();
         mRightEncoder = mShooterRight.getEncoder();
 
-        mLeftPID.setP(0.00011494*2);
-        mRightPID.setP(0.00010526*2);
+        mLeftPID.setP(0.0000011494*2);
+        mRightPID.setP(0.0000010526*2);
         mLeftPID.setD(0.00057471*3);
         mRightPID.setD(0.00052632*3);
         mLeftPID.setFF(0.00011494);

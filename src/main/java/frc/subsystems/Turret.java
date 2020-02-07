@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import firelib.looper.ILooper;
 import firelib.looper.Loop;
 import firelib.subsystem.TalonServoSubsystem;
+import frc.robot.Constants;
 
 /**
  * implementation to control the turret on the robot
@@ -31,6 +32,14 @@ public class Turret extends TalonServoSubsystem {
     protected Turret(TalonSRX servoMotor) {
         super(servoMotor);
         // TODO Auto-generated constructor stub
+        mServoMotor.setInverted(false);
+        mServoMotor.config_kF(0,2.9416666666666667);
+        mServoMotor.configMotionCruiseVelocity(210);
+        mServoMotor.configMotionAcceleration(210);
+        mServoMotor.config_kP(0,10);
+        mServoMotor.config_kD(0,1);
+        mServoMotor.config_kI(0,0.023); //4062 ticks to rev
+        mServoMotor.setSensorPhase(true);
     }
 
     /**
@@ -44,9 +53,9 @@ public class Turret extends TalonServoSubsystem {
      * sets the angle of the turret for closed loop control
      * @param angle angle of the turret
      */
-    public synchronized void setDesiredAngle(int angle) {
+    public synchronized void setDesiredAngle(double angle) {
         //TODO figure out conversion rate between angle and encoder ticks
-        mPeriodicIO.mDesiredAngle = angle;
+        mPeriodicIO.mDesiredAngle =  (angle * Constants.TURRET_TICK_TO_ANGLE);
     }
 
     /**
@@ -139,7 +148,7 @@ public class Turret extends TalonServoSubsystem {
     }
 
     private class PeriodicIO {
-        public int mDesiredAngle = 0;
+        public double mDesiredAngle = 0;
         public double mDesiredSpeed = 0;
         public double mCurrentSpeed = 0;
     }

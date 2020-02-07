@@ -1,10 +1,24 @@
 package frc.subsystems.drivetrain;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import com.ctre.phoenix.motion.TrajectoryPoint;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.music.Orchestra;
 import com.kauailabs.navx.frc.AHRS;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.I2C.Port;
+import edu.wpi.first.wpilibj.controller.RamseteController;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.trajectory.Trajectory;
+import edu.wpi.first.wpilibj.util.Units;
 import firelib.looper.ILooper;
 import firelib.looper.Loop;
 import firelib.subsystem.ISubsystem;
@@ -13,13 +27,27 @@ import frc.robot.RobotMap;
 public class Drivetrain implements ISubsystem {
 
     public enum ControlType{
-        OPEN_LOOP, POSITION_CLOSED_LOOP, TRAJECTORY_FOLLOWING;
+        OPEN_LOOP, POSITION_CLOSED_LOOP, TRAJECTORY_FOLLOWING, LONG_SQUAD;
     }
     private static Drivetrain instance;
     private PeriodicIO mPeriodicIO = new PeriodicIO();
     private MotorBase mMotorBase;
-    private Kinematics kinematics = new Kinematics(0.6096, 7.8);
+    private fireKinematics kinematics = new fireKinematics(0.6096, 7.8);
+    /**
+     * variables for trajectory following
+     */
+    private DifferentialDriveKinematics mTrajKinematics = new DifferentialDriveKinematics(0.6096);
     private AHRS mGyro = new AHRS(Port.kMXP);
+    private DifferentialDriveOdometry mOdometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(-mGyro.getYaw()));
+    private RamseteController mController = new RamseteController();
+    private Trajectory mTrajectory;
+    private Timer mTimer = new Timer();
+    private double mTimeStamp = 0;
+    private double mTrajectoryTime;
+    /**
+     * variables for music playing
+     */
+    private Orchestra mOrchestra;
     private ControlType mControlType = ControlType.OPEN_LOOP;
 
     /**
@@ -41,6 +69,9 @@ public class Drivetrain implements ISubsystem {
      */
     public Drivetrain(TalonFX masterLeft, TalonFX masterRight, TalonFX slaveLeft, TalonFX slaveRight) {
         mMotorBase = new MotorBase(masterLeft, masterRight, slaveLeft, slaveRight);
+        ArrayList<TalonFX> list = new ArrayList<TalonFX>();
+        mOrchestra = new Orchestra(Arrays.asList(masterLeft,masterRight,slaveLeft,slaveRight));
+        mOrchestra.loadMusic("beeg11.chrp");
 
     }
 
@@ -49,12 +80,24 @@ public class Drivetrain implements ISubsystem {
         mPeriodicIO.mDemandedThrottle = demandedThrottle;
         mPeriodicIO.mDemandedRot = demandedRot;
     }
+
+    public synchronized void setTrajectory(Trajectory traj) {
+        mTrajectory = traj;
+    }
+
+    public synchronized void setTimestamp(double time) {
+        mTimeStamp = time;
+    }
+
+    public synchronized void setControlType(ControlType type) {
+        mControlType = type;
+    }
     /**
      * basic drive code for normal use
      */
     private synchronized void cartersianDrive() {
         DriveSignal signal = kinematics.toWheelSpeeds(mPeriodicIO.mDemandedThrottle, mPeriodicIO.mDemandedRot);
-        mMotorBase.setVelocity(signal.getLeftSpeed(), signal.getRightSpeed());
+        mMotorBase.setVelocity(signal.getLeftSpeed()*Units.feetToMeters(25.6), signal.getRightSpeed()*Units.feetToMeters(25.6));
     }
 
     /**
@@ -69,19 +112,35 @@ public class Drivetrain implements ISubsystem {
      * depending on if its just positon or trajectory
      */
     private synchronized void handleClosedLoop() {
-        //TODO add logic here
+        if(mControlType == ControlType.TRAJECTORY_FOLLOWING) {
+            mTrajectoryTime = Timer.getFPGATimestamp() - mTimeStamp;
+            mTimer.start();
+            Trajectory.State goal = mTrajectory.sample(mTrajectoryTime);
+            ChassisSpeeds speeds = mController.calculate(mOdometry.getPoseMeters(), goal);
+            DifferentialDriveWheelSpeeds diffSpeeds = mTrajKinematics.toWheelSpeeds(speeds);
+            mMotorBase.setVelocity(diffSpeeds.leftMetersPerSecond, diffSpeeds.rightMetersPerSecond);
+            if(mTrajectoryTime+mTimeStamp >= mTrajectory.getTotalTimeSeconds()+mTimeStamp) {
+                mControlType = ControlType.OPEN_LOOP;
+            }
+        }
+        if(mControlType == ControlType.LONG_SQUAD) {
+            if(!mOrchestra.isPlaying()) {
+                mOrchestra.play();
+            }
+        }
     }
 
     @Override
     public void updateSmartDashboard() {
-        SmartDashboard.putNumber("Drivetrain Speed", mPeriodicIO.mDemandedThrottle);
-        SmartDashboard.putNumber("Gyro",-mGyro.getYaw());
+        SmartDashboard.putBoolean("Drivetrain State", mControlType == ControlType.LONG_SQUAD);
+        SmartDashboard.putNumber("Left Drivetrain Speed", mPeriodicIO.mLeftVel);
+        SmartDashboard.putNumber("Right Drivetrain Speed", mPeriodicIO.mRightVel);
     }
 
     @Override
     public void pollTelemetry() {
-        mPeriodicIO.mLeftVel = 0;
-        mPeriodicIO.mRightVel = 0;
+        mPeriodicIO.mLeftVel = mMotorBase.getLeftVelocity();
+        mPeriodicIO.mRightVel = mMotorBase.getRightVeloicty();
 
     }
 
@@ -106,7 +165,15 @@ public class Drivetrain implements ISubsystem {
             public void onLoop(double timestamp) {
                 // TODO Auto-generated method stub
                 synchronized (Drivetrain.this) {
-                    if(mControlType != ControlType.POSITION_CLOSED_LOOP || mControlType != ControlType.TRAJECTORY_FOLLOWING) {
+                    //update odometry
+                    var angle             = Rotation2d.fromDegrees(-mGyro.getYaw());
+                    var rawLeftRotations  = (mMotorBase.getLeftPos()/2048)/6.54545788;
+                    var rawRightRotations = mMotorBase.getRightPos()/2048/6.54545788;
+
+                    var leftDistanceMeters  = rawLeftRotations*(Math.PI*2*(Units.inchesToMeters(3)));
+                    var rightDistanceMeters = rawRightRotations*(Math.PI*2*(Units.inchesToMeters(3)));
+                    mOdometry.update(Rotation2d.fromDegrees(-mGyro.getYaw()), leftDistanceMeters, rightDistanceMeters);
+                    if(mControlType != ControlType.POSITION_CLOSED_LOOP && mControlType != ControlType.TRAJECTORY_FOLLOWING && mControlType != ControlType.LONG_SQUAD) {
                         handleOpenLoop();
                     } else {
                         handleClosedLoop();

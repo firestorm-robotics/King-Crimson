@@ -1,11 +1,11 @@
 package frc.subsystems.drivetrain;
 
-public class Kinematics {
+public class fireKinematics {
     private final double mTrackWidth;
     private final double mMaxOmega;
     private final double mMaxVel;
 
-    public Kinematics(double trackWidth, double maxVel) {
+    public fireKinematics(double trackWidth, double maxVel) {
         mTrackWidth = trackWidth;
         mMaxVel = maxVel;
         mMaxOmega = (mMaxVel * 2) / mTrackWidth;

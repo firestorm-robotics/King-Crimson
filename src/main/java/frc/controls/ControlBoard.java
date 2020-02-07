@@ -48,4 +48,20 @@ public class ControlBoard implements IButtonControlBoard, IJoystickControlBoard 
     public int getPOV(){
         return mDriveController.getPOV();
     }
+
+    @Override
+    public boolean initalizeTrajectory() {
+        // TODO Auto-generated method stub
+        return mDriveController.getBumperPressed(Hand.kRight);
+    }
+
+    @Override
+    public boolean getEnableTrajectory() {
+        // TODO Auto-generated method stub
+        return mDriveController.getBumper(Hand.kRight);
+    }
+
+    public boolean getMusic() {
+        return mDriveController.getAButtonPressed();
+    }
 }

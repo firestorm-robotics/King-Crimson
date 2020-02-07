@@ -79,7 +79,7 @@ public class Intake extends StateSubsystem<IntakeState> {
             @Override
             public void onLoop(double timestamp) {
                 // TODO Auto-generated method stub
-                synchronized (this) {
+                synchronized (Intake.this) {
                     update();
                 }
 

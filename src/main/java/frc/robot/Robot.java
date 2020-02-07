@@ -10,6 +10,7 @@ package frc.robot;
 import java.util.Arrays;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import firelib.looper.Looper;
 import frc.controls.ControlBoard;
@@ -24,6 +25,8 @@ import frc.subsystems.Shooter.ShooterStates;
  * project.
  */
 import frc.subsystems.drivetrain.Drivetrain;
+import frc.subsystems.drivetrain.Drivetrain.ControlType;
+import frc.trajectories.SimpleTrajectory;
 import frc.utils.KingMathUtils;
 
 public class Robot extends TimedRobot {
@@ -32,14 +35,16 @@ public class Robot extends TimedRobot {
   private ControlBoard mControls = ControlBoard.getInstance();
   private Drivetrain mDrivetrain = Drivetrain.getInstance();
   //private Shooter mShooter = Shooter.getInstance();
-  //private Turret mTurret = Turret.getInstance();
+  private Turret mTurret = Turret.getInstance();
+  private SimpleTrajectory mSimpleTrajectory = new SimpleTrajectory();
   private final SubsystemManager mSubsystemManager = new SubsystemManager(
-      Arrays.asList(mDrivetrain));
+      Arrays.asList(mDrivetrain,mTurret));
 
   @Override
   public void robotInit() {
     mSubsystemManager.registerEnabledLoops(mEnabledLooper);
     mSubsystemManager.registerDisabledLoops(mDisabledLooper);
+    mSimpleTrajectory.generateTrajectory();
   }
 
   @Override
@@ -62,6 +67,8 @@ public class Robot extends TimedRobot {
   public void teleopInit() {
     mDisabledLooper.stop();
     mEnabledLooper.start();
+    mDrivetrain.setTrajectory(mSimpleTrajectory.getTrajectory());
+    mTurret.resetEncoder();
 
   }
 
@@ -75,27 +82,51 @@ public class Robot extends TimedRobot {
     boolean wanstToTurnTurretLeft = mControls.getTurnTurretLeft();
     boolean wantsToTurnTurretRight = mControls.getTurnTurretRight();
 
+    boolean wantsToFollowTrajectory = mControls.initalizeTrajectory();
+    boolean wantsToTurnTurret = mControls.getEnableTrajectory();
     /*if (wantsShot) {
       mShooter.setIO(-1*throttle, 11000*-throttle);
       mShooter.setState(ShooterStates.SPINNING_UP);
     } else {
       mShooter.setIO(0, 0);
       mShooter.setState(ShooterStates.IDLE);
-    }
-
-    if (wanstToTurnTurretLeft) {
-      mTurret.setOpenloopPower(1);
-    } else if (wantsToTurnTurretRight) {
-      mTurret.setOpenloopPower(-1);
-    } else {
-      mTurret.setOpenloopPower(0);
     }*/
 
+    if (wanstToTurnTurretLeft) {
+      mTurret.setOpenloopPower(-1);
+      mTurret.setControlType(Turret.ControlType.OPEN_LOOP);
+    } else if (wantsToTurnTurretRight) {
+      mTurret.setOpenloopPower(1);
+      mTurret.setControlType(Turret.ControlType.OPEN_LOOP);
+    } else {
+      mTurret.setOpenloopPower(0);
+    }
+
+
+
+    if(wantsToTurnTurret) {
+      //mDrivetrain.setTimestamp(Timer.getFPGATimestamp());
+      //mDrivetrain.setControlType(Drivetrain.ControlType.TRAJECTORY_FOLLOWING);
+      /*if(mControls.getPOV() != -1) {
+      mTurret.setDesiredAngle(mControls.getPOV());
+      mTurret.setControlType(Turret.ControlType.POSITION_CLOSED_LOOP);*/
+      mTurret.setDesiredAngle(180);
+      mTurret.setControlType(Turret.ControlType.POSITION_CLOSED_LOOP);
+      } else {
+        mTurret.setDesiredAngle(0);
+    }
+
     if (!wantsShot) {
-      mDrivetrain.setIO(KingMathUtils.logit(-throttle*0.7), -KingMathUtils.turnExp(rot*0.5));
+     mDrivetrain.setIO(KingMathUtils.logit(-throttle*0.7), -KingMathUtils.turnExp(rot*0.5));
+
     } else {
       mDrivetrain.setIO(0,0);
     }
+
+    if(mControls.getMusic()) {
+      mDrivetrain.setControlType(ControlType.LONG_SQUAD);
+    }
+    SmartDashboard.putNumber("Pov", mControls.getPOV()*Constants.TURRET_TICK_TO_ANGLE);
   }
 
   @Override
