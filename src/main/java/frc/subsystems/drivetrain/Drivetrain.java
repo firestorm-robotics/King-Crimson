@@ -171,7 +171,7 @@ public class Drivetrain implements ISubsystem {
 
             @Override
             public void onStart(double timestamp) {
-                // TODO Auto-generated method stub
+                mControlType = ControlType.OPEN_LOOP;
 
             }
 
