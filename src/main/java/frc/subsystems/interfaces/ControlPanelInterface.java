@@ -1,4 +1,4 @@
-package frc.subsystems;
+package frc.subsystems.interfaces;
 
 public interface ControlPanelInterface {
 
