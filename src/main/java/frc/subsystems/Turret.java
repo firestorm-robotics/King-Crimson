@@ -1,6 +1,7 @@
 package frc.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import firelib.looper.ILooper;
@@ -15,12 +16,15 @@ import frc.robot.Constants;
 public class Turret extends TalonServoSubsystem {
 
     public enum ControlType {
-        OPEN_LOOP(), POSITION_CLOSED_LOOP(), VELOCITY_CLOSED_LOOP(), VELOCITY_OPEN_LOOP;
+        OPEN_LOOP(), POSITION_CLOSED_LOOP(), VISION_CLOSED_LOOP(), VELOCITY_OPEN_LOOP;
     }
 
     private ControlType mControlType = ControlType.OPEN_LOOP;
     private PeriodicIO mPeriodicIO = new PeriodicIO();
+    private PIDConstants mPIDConstants = new PIDConstants();
     private static Turret instance;
+
+
 
     public static Turret getInstance() {
         if (instance == null) {
@@ -28,7 +32,7 @@ public class Turret extends TalonServoSubsystem {
         }
         return instance;
     }
-
+    
     protected Turret(TalonSRX servoMotor) {
         super(servoMotor);
         mServoMotor.setInverted(false);
@@ -39,6 +43,11 @@ public class Turret extends TalonServoSubsystem {
         mServoMotor.config_kD(0,1);
         mServoMotor.config_kI(0,0.023); //4062 ticks to rev
         mServoMotor.setSensorPhase(true);
+
+        mPIDConstants.kP = 0.037037037037037*0.75; 
+
+        //mTurretAngleLeft.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
+        //mTurretAngleRight.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
     }
 
     /**
@@ -62,6 +71,11 @@ public class Turret extends TalonServoSubsystem {
      */
     public synchronized void setOpenloopPower(double power) {
         mPeriodicIO.mDesiredSpeed = power;
+        mServoMotor.set(ControlMode.PercentOutput,power);
+    }
+
+    public synchronized double getAngle() {
+        return mServoAngle;
     }
 
     /**
@@ -87,8 +101,13 @@ public class Turret extends TalonServoSubsystem {
         // TODO Maybe add velocity control
         if(mControlType == ControlType.POSITION_CLOSED_LOOP) {
             setPos(mPeriodicIO.mDesiredAngle);
-        } else if(mControlType == ControlType.VELOCITY_CLOSED_LOOP) {
+        } else if(mControlType == ControlType.VISION_CLOSED_LOOP) {
             //TODO maybe add velocity control
+            mPIDConstants.currentError = mPeriodicIO.mTargettedAngle;
+            double p_Power = -mPIDConstants.currentError*mPIDConstants.kP;
+            double d_Power = -mPIDConstants.kD * (mPIDConstants.currentError-mPIDConstants.lastError);
+            System.out.println(p_Power);
+            setOpenloopPower(p_Power + d_Power);
         }
     }
 
@@ -108,7 +127,7 @@ public class Turret extends TalonServoSubsystem {
 
     @Override
     public void pollTelemetry() {
-        mServoAngle = mServoMotor.getSelectedSensorPosition();
+        mServoAngle = (mServoMotor.getSelectedSensorPosition()/4092) * 360;
         mPeriodicIO.mCurrentSpeed = mServoMotor.getSelectedSensorVelocity();
 
     }
@@ -131,11 +150,14 @@ public class Turret extends TalonServoSubsystem {
             @Override
             public void onLoop(double timestamp) {
                 synchronized (Turret.this) {
-                    if (mControlType != ControlType.POSITION_CLOSED_LOOP) {
+                    if (mControlType != ControlType.POSITION_CLOSED_LOOP && mControlType != ControlType.VISION_CLOSED_LOOP) {
                         handleOpenLoop();
                     } else {
                         handleClosedLoop();
                     }
+
+                    mPeriodicIO.mTargettedAngle = SmartDashboard.getNumber("x_offset", 0);
+                    //System.out.println(mPeriodicIO.mTargettedAngle);
                 }
             }
         });
@@ -146,6 +168,15 @@ public class Turret extends TalonServoSubsystem {
         public double mDesiredAngle = 0;
         public double mDesiredSpeed = 0;
         public double mCurrentSpeed = 0;
+        public double mTargettedAngle = 0;
+    }
+
+    private class PIDConstants {
+        public double kP = 0;
+        public double kI = 0;
+        public double kD = 0;
+        public double currentError = 0;
+        public double lastError = 0;
     }
 
 }
