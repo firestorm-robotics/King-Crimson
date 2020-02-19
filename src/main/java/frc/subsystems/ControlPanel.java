@@ -1,4 +1,6 @@
 package frc.subsystems;
+/*DEPRECATED EVERYTHING (We might need import stuff)
+
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
@@ -6,11 +8,11 @@ import com.revrobotics.ColorSensorV3;
 
 import edu.wpi.first.wpilibj.I2C;
 // DEPRACATED BUT STILL MAYBE USABLE
-/*
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-*/
+
+//import com.revrobotics.CANSparkMax;
+//import com.revrobotics.CANSparkMaxLowLevel;
+//import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+
 import frc.robot.RobotMap;
 import edu.wpi.first.wpilibj.util.Color;
 
@@ -26,5 +28,17 @@ class ControlPanel{
     // Just check the file in "/" that you can't mess with.
     ControlPanel(){
         rotatorforthecolorwheel.set(ControlMode.Position,0.5);
+    }
+}*/
+
+import frc.subsystems.GoalFlow;
+
+public class ControlPanel extends GoalFlow{
+    public ControlPanel(){
+        super();
+
+    }
+    void runGoal(Object... args) {
+        
     }
 }
