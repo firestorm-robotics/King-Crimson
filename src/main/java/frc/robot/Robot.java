@@ -5,6 +5,9 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+
+// HFOV for logitech webcam 70.42
+// VFOV for logitech webacm 41.94
 package frc.robot;
 
 import java.util.Arrays;
@@ -114,13 +117,17 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("X", mControls.getBoardX());
 
     if (wantsShot) {
-      mShooter.setIO(-1 * throttle, 11000 * -throttle);
-      mShooter.setState(Shooter.ShooterStates.OPEN_LOOP);
-      mIndexer.setIO(0.5);
+      mShooter.setIO(-1 * throttle, 13750 * -throttle);
+      mShooter.setState(Shooter.ShooterStates.SPINNING_UP);
+      if (mShooter.atSpeed()) {
+        mIndexer.setIO(0.75);
+      } else {
+        mIndexer.setIO(0);
+      }
     } else {
       mShooter.setIO(0, 0);
       mShooter.setState(Shooter.ShooterStates.IDLE);
-      mIndexer.setIO(0);
+      mIndexer.setIO(-mControls.getRightY());
     }
 
     if (wanstToTurnTurretLeft) {
@@ -150,9 +157,9 @@ public class Robot extends TimedRobot {
     }
 
     if (raiseSuperstructure) {
-      mSuperstructureAngle.setIO(0.2);
+      mSuperstructureAngle.setIO(0.5);
     } else if (lowerSuperstructure) {
-      mSuperstructureAngle.setIO(-0.2);
+      mSuperstructureAngle.setIO(-0.5);
     } else {
       mSuperstructureAngle.setIO(0);
     }
@@ -165,6 +172,7 @@ public class Robot extends TimedRobot {
     }
 
     SmartDashboard.putBoolean("Toggle", mToggleIntake.getCurrentState());
+    SmartDashboard.putBoolean("LooperRunning",isEnabled());
   }
 
   @Override

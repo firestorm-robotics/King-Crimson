@@ -38,7 +38,7 @@ public class Indexer implements ISubsystem {
      */
     public static Indexer getInstance() {
         if(instance == null) {
-            instance = new Indexer(new TalonSRX(RobotMap.INDEX_LEFT), new TalonSRX(RobotMap.INDEX_RIGHT));
+            instance = new Indexer(new TalonSRX(RobotMap.INDEX_LEFT), new VictorSPX(RobotMap.PREBELT));
         }
 
         return instance;
@@ -49,14 +49,12 @@ public class Indexer implements ISubsystem {
      * @param rightBelt the motor controlling the right belt
      * @param leftBelt the motor controlling the left belt
      */
-    public Indexer(TalonSRX rightBelt, TalonSRX leftBelt) {
-        mRightBelt = rightBelt;
+    public Indexer(TalonSRX leftBelt, VictorSPX preBelt) {
+        mPreBelt = preBelt;
         mLeftBelt = leftBelt;
 
-        mRightBelt.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
         mLeftBelt.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
 
-        mRightBelt.setInverted(InvertType.InvertMotorOutput);
     }
 
     public synchronized void setPos(int ticks) {
@@ -83,13 +81,13 @@ public class Indexer implements ISubsystem {
      * sets the motors to a percentage of voltage
      */
     public synchronized void handleOpenLoop() {
-        mRightBelt.set(ControlMode.PercentOutput,mPeriodicIO.power);
         mLeftBelt.set(ControlMode.PercentOutput,mPeriodicIO.power);
+        mPreBelt.set(ControlMode.PercentOutput,mPeriodicIO.power);
+
     }
 
     @Override
     public void updateSmartDashboard() {
-        SmartDashboard.putNumber("Indexer/RightSpeed",mRightBelt.getSelectedSensorVelocity());
         SmartDashboard.putNumber("Indexer/LeftSpeed",mLeftBelt.getSelectedSensorVelocity());
 
     }

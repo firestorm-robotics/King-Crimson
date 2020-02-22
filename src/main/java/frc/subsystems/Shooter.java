@@ -69,12 +69,12 @@ public class Shooter implements ISubsystem {
         
         //TODO Tune these
          
-        mLeftPID.setP(0.0000011494*2);
-        mRightPID.setP(0.0000010526*2);
+        mLeftPID.setP(0.0000011494/2);
+        mRightPID.setP(0.0000010526/2);
         mLeftPID.setD(0);
         mRightPID.setD(0);
-        mLeftPID.setFF(0.00011494);
-        mRightPID.setFF(0.00010526);
+        mLeftPID.setFF(0.00015);
+        mRightPID.setFF(0.00014567);
 
         mShooterLeft.setInverted(false);
         mShooterRight.setInverted(true);
@@ -82,6 +82,10 @@ public class Shooter implements ISubsystem {
 
     public synchronized void setState(ShooterStates state) {
         mDesiredState = state;
+    }
+
+    public synchronized boolean atSpeed() {
+        return mPeriodicIO.mCurrentLeftSpd/3 >= 3200; 
     }
 
     /**

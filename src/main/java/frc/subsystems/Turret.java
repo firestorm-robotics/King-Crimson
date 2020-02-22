@@ -43,8 +43,12 @@ public class Turret extends TalonServoSubsystem {
         mServoMotor.config_kD(0,1);
         mServoMotor.config_kI(0,0.023); //4062 ticks to rev
         mServoMotor.setSensorPhase(true);
+        mServoMotor.configForwardSoftLimitThreshold(4092/2);
+        mServoMotor.configReverseSoftLimitThreshold(-4092/2);
+        mServoMotor.configForwardSoftLimitEnable(true);
+        mServoMotor.configReverseSoftLimitEnable(true);
 
-        mPIDConstants.kP = 0.037037037037037*0.75; 
+        mPIDConstants.kP = 0.02840102*0.75; 
 
         //mTurretAngleLeft.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
         //mTurretAngleRight.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
@@ -105,8 +109,7 @@ public class Turret extends TalonServoSubsystem {
             //TODO maybe add velocity control
             mPIDConstants.currentError = mPeriodicIO.mTargettedAngle;
             double p_Power = -mPIDConstants.currentError*mPIDConstants.kP;
-            double d_Power = -mPIDConstants.kD * (mPIDConstants.currentError-mPIDConstants.lastError);
-            System.out.println(p_Power);
+            double d_Power = -mPIDConstants.kD * (mPIDConstants.currentError-mPIDConstants.lastError)/0.005;
             setOpenloopPower(p_Power + d_Power);
         }
     }

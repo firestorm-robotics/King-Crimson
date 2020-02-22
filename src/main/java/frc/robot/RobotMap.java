@@ -18,4 +18,6 @@ public class RobotMap {
     
     public static final int INTAKE_ANGLE = 20,
                             INTAKE_SPEED = 21;
+
+    public static final int PREBELT = 25;
 }

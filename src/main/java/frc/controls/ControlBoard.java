@@ -29,6 +29,10 @@ public class ControlBoard implements IButtonControlBoard, IJoystickControlBoard 
 
     }
 
+    public double getRightY() {
+        return mDriveController.getY(Hand.kRight);
+    }
+
     @Override
     public boolean getShoot() {
         return mDriveController.getBumper(Hand.kLeft);

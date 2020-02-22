@@ -14,11 +14,13 @@ public class SuperstructureAngle implements ISubsystem {
 
     public enum ControlType {
         OPEN_LOOP,
-        POSITION_CLOSED_LOOP;
+        POSITION_CLOSED_LOOP,
+        VISION_CLOSED_LOOP;
     }
     private TalonSRX mAngleLeft;
     private TalonSRX mAngleRight;
     private PeriodicIO mPeriodicIO = new PeriodicIO();
+    private PIDConstants mConstants = new PIDConstants();
     private ControlType mControlType = ControlType.OPEN_LOOP;
     private static SuperstructureAngle instance;
 
@@ -39,6 +41,8 @@ public class SuperstructureAngle implements ISubsystem {
         mAngleRight.follow(mAngleLeft);
         mAngleLeft.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
         mAngleRight.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
+
+        mConstants.kP = 0.04768717*0.75;
     }
 
 
@@ -47,11 +51,19 @@ public class SuperstructureAngle implements ISubsystem {
     }
 
     private synchronized void handleOpenLoop() {
-        mAngleLeft.set(ControlMode.PercentOutput,mPeriodicIO.demandedPower);
+        setOpenLoopPower(mPeriodicIO.demandedPower);
     }
 
+
     private synchronized void handleClosedLoop() {
-        return;
+        if (mControlType == ControlType.VISION_CLOSED_LOOP) {
+            double p_power = mConstants.kP * mPeriodicIO.camaraAngleOffset;
+            setOpenLoopPower(mPeriodicIO.demandedPower);
+        }
+    }
+
+    private synchronized void setOpenLoopPower(double power) {
+        mAngleLeft.set(ControlMode.PercentOutput,power);
     }
     @Override
     public void updateSmartDashboard() {
@@ -109,6 +121,14 @@ public class SuperstructureAngle implements ISubsystem {
         public double demandedPower;
 
         public double currentAngle;
+    }
+
+    private class PIDConstants {
+        public double kP = 0;
+        public double kI = 0;
+        public double kD = 0;
+        public double currentError = 0;
+        public double lastError = 0;
     }
     
 }
