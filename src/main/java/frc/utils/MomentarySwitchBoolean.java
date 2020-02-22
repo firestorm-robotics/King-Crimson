@@ -11,6 +11,8 @@ public class MomentarySwitchBoolean extends UtilBoolean {
         if (update != mLastState) {
             if (update == mPolarity) {
                 mCurrentState = !mCurrentState;
+            } else {
+                mCurrentState = false;
             }
         }
         if (update == mLastState) {
