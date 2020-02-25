@@ -10,6 +10,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
 import edu.wpi.first.wpilibj.util.Units;
 
+
 public class MotorBase {
     private TalonFX mMasterLeft;
     private TalonFX mMasterRight;

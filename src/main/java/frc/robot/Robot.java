@@ -12,14 +12,16 @@ package frc.robot;
 
 import java.util.Arrays;
 
-import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.TimedRobot;
 import firelib.looper.Looper;
 import frc.controls.ControlBoard;
 import frc.subsystems.Indexer;
 import frc.subsystems.Intake;
 import frc.subsystems.Turret;
 import frc.subsystems.Shooter;
+import frc.subsystems.Shooter.ShooterStates;
+
 import frc.subsystems.SuperstructureAngle;
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -41,6 +43,7 @@ public class Robot extends TimedRobot {
   private Drivetrain mDrivetrain = Drivetrain.getInstance();
   private Indexer mIndexer = Indexer.getInstance();
   private Shooter mShooter = Shooter.getInstance();
+ 
   private Turret mTurret = Turret.getInstance();
   private Intake mIntake = Intake.getInstance();
   private SuperstructureAngle mSuperstructureAngle = SuperstructureAngle.getInstance();
