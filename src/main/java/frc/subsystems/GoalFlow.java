@@ -8,7 +8,7 @@ enum Goal { // The integer numbers to represent different control panel function
 // Sample "Goals" as in things for the robot to achieve
 // The computer sets a goal to go to a color, or go a number of rotations, respectively.
 public class GoalFlow { // Use the goals to do things with the robot here
-    private Goal currentGoal;
+    protected Goal currentGoal;
     private Object[] args;
     private int tick=0;
     public GoalFlow(){
