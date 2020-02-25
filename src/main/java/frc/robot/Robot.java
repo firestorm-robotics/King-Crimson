@@ -117,8 +117,8 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("X", mControls.getBoardX());
 
     if (wantsShot) {
-      mShooter.setIO(-1 * throttle, 13750 * -throttle);
-      mShooter.setState(Shooter.ShooterStates.SPINNING_UP);
+      mShooter.setIO(-1.2 * throttle, /*13750 * -throttle*/ 2500*3);
+      mShooter.setState(Shooter.ShooterStates.OPEN_LOOP);
       if (mShooter.atSpeed()) {
         mIndexer.setIO(0.75);
       } else {
@@ -148,6 +148,7 @@ public class Robot extends TimedRobot {
 
     if (runIntake) {
       mIntake.runIntake();
+      mIndexer.setIO(1);
     } else {
       mIntake.stopIntake();
     }

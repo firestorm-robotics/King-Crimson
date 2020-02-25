@@ -43,13 +43,13 @@ public class Intake extends StateSubsystem<IntakeState> {
         mIntake = intake;
 
         mIntakeAngle.setInverted(false);
-        mIntakeAngle.setSensorPhase(true);
+        mIntakeAngle.setSensorPhase(false);
         
         mIntakeAngle.configRemoteFeedbackFilter(mAngleEncoder,0);
         mIntakeAngle.configSelectedFeedbackSensor(FeedbackDevice.RemoteSensor0);
 
-        mIntakeAngle.configMotionCruiseVelocity(800);
-        mIntakeAngle.configMotionAcceleration(400*2);
+        mIntakeAngle.configMotionCruiseVelocity(400); //max 800
+        mIntakeAngle.configMotionAcceleration(200);
         mIntakeAngle.config_kF(0,1.123456879);
         mIntakeAngle.config_kP(0,4);
         mIntakeAngle.config_kD(0,27);

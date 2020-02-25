@@ -20,4 +20,7 @@ public class RobotMap {
                             INTAKE_SPEED = 21;
 
     public static final int PREBELT = 25;
+
+    public static final int CLIMB = 15,
+                            CLIMB_SLIDER = 22 ;
 }
