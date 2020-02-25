@@ -38,7 +38,7 @@ public class ControlPanel extends GoalFlow{
         super();
 
     }
-    void runGoal(Object... args) {
+    public void runGoal(Object... args) {
         
     }
 }

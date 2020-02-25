@@ -16,15 +16,17 @@ public class GoalFlow { // Use the goals to do things with the robot here
     public void setGoal(Goal goal, Object... argv){
         this.args=argv;
         this.currentGoal=goal;
-    }; // Setter for goals
+    } // Setter for goals
 
     public Goal getGoal() {
         return this.currentGoal;
-    }; // Get the current goal
+    } // Get the current goal
 
     public void endGoal(){
         this.currentGoal=Goal.NONE;
-    }; // Detach the goal
+    } // Detach the goal
 
-    public void runGoal(Object... args){}; // Run code for goals
+    public void runGoal(Object... args){
+        
+    } // Run code for goals
 }
