@@ -10,6 +10,7 @@ enum Goal { // The integer numbers to represent different control panel function
 public class GoalFlow { // Use the goals to do things with the robot here
     private Goal currentGoal;
     private Object[] args;
+    private int tick=0;
     public GoalFlow(){
         currentGoal=Goal.NONE;
     }
@@ -26,7 +27,7 @@ public class GoalFlow { // Use the goals to do things with the robot here
         this.currentGoal=Goal.NONE;
     } // Detach the goal
 
-    public void runGoal(Object... args){
-        
+    public void runGoal(int tick,Object... args){
+        this.tick++;
     } // Run code for goals
 }
