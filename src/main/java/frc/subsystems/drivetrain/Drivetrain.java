@@ -53,7 +53,7 @@ public class Drivetrain implements ISubsystem {
     /**
      * singleton method for use throughout the robot
      * 
-     * @return
+     * @return single drivetrain instance
      */
     public static Drivetrain getInstance() {
         if (instance == null) {
@@ -68,9 +68,10 @@ public class Drivetrain implements ISubsystem {
      * ctor -- DO NOT USE -- except for unit testing
      */
     public Drivetrain(TalonFX masterLeft, TalonFX masterRight, TalonFX slaveLeft, TalonFX slaveRight) {
-        mMotorBase = new MotorBase(masterLeft, masterRight, slaveLeft, slaveRight);
         mOrchestra = new Orchestra(Arrays.asList(masterLeft, masterRight, slaveLeft, slaveRight));
-        mOrchestra.loadMusic("beeg11.chrp");
+        mOrchestra.loadMusic("beeg2.chrp");
+        mMotorBase = new MotorBase(masterLeft, masterRight, slaveLeft, slaveRight);
+        
 
     }
 
@@ -95,6 +96,14 @@ public class Drivetrain implements ISubsystem {
 
     public synchronized void setControlType(ControlType type) {
         mControlType = type;
+    }
+
+    public synchronized void resetGyro() {
+        mGyro.reset();
+    }
+
+    public synchronized void resetEncoders() {
+        mMotorBase.resetEncoders();
     }
 
     /**

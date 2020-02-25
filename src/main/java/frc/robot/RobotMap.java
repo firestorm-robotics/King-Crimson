@@ -8,4 +8,19 @@ public class RobotMap {
 
     public static final int SHOOTER_LEFT = 10, 
                             SHOOTER_RIGHT = 11;
+
+    public static final int TURRET_ID = 15,
+                            SHOOTER_ANGLE_LEFT  = 16,
+                            SHOOTER_ANGLE_RIGHT = 17;
+
+    public static final int INDEX_LEFT = 18,
+                            INDEX_RIGHT = 19;
+    
+    public static final int INTAKE_ANGLE = 20,
+                            INTAKE_SPEED = 21;
+
+    public static final int PREBELT = 25;
+
+    public static final int CLIMB = 15,
+                            CLIMB_SLIDER = 22 ;
 }

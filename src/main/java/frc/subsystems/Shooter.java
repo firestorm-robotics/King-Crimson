@@ -33,12 +33,23 @@ public class Shooter implements ISubsystem {
     private CANEncoder mRightEncoder;
 
     private static Shooter instance;
+
+    /**
+     * Singleton method for use throughout the robot
+     * @return instance of the shooter
+     */
     public static Shooter getInstance() {
         if (instance == null) {
             instance = new Shooter(new CANSparkMax(RobotMap.SHOOTER_LEFT, MotorType.kBrushless), new CANSparkMax(RobotMap.SHOOTER_RIGHT, MotorType.kBrushless));
         }
         return instance;
     }
+
+    /**
+     * Ctor - Do not use unless for static builders or unit testing
+     * @param shooterLeft SparkMax instance for the left of the shooter
+     * @param shooterRight SparkMax instance for the right of the shooter
+     */
     public Shooter(CANSparkMax shooterLeft, CANSparkMax shooterRight) {
         mShooterLeft  = shooterLeft;
         mShooterRight = shooterRight;
@@ -46,8 +57,8 @@ public class Shooter implements ISubsystem {
         mShooterLeft.enableVoltageCompensation(12);
         mShooterRight.enableVoltageCompensation(12);
 
-        mShooterLeft.setSmartCurrentLimit(40);
-        mShooterRight.setSmartCurrentLimit(40);
+        mShooterLeft.setSmartCurrentLimit(27);
+        mShooterRight.setSmartCurrentLimit(27);
 
         mLeftPID  = mShooterLeft.getPIDController();
         mRightPID = mShooterRight.getPIDController();
@@ -55,19 +66,26 @@ public class Shooter implements ISubsystem {
         mLeftEncoder  = mShooterLeft.getEncoder();
         mRightEncoder = mShooterRight.getEncoder();
 
-        mLeftPID.setP(0.0000011494*2);
-        mRightPID.setP(0.0000010526*2);
-        mLeftPID.setD(0.00057471*3);
-        mRightPID.setD(0.00052632*3);
-        mLeftPID.setFF(0.00011494);
-        mRightPID.setFF(0.00010526);
+        
+        //TODO Tune these
+         
+        mLeftPID.setP(0.0000011494/2);
+        mRightPID.setP(0.0000010526/2);
+        mLeftPID.setD(0);
+        mRightPID.setD(0);
+        mLeftPID.setFF(0.00015);
+        mRightPID.setFF(0.00014567);
 
-        mShooterLeft.setInverted(true);
+        mShooterLeft.setInverted(false);
         mShooterRight.setInverted(true);
     }
 
     public synchronized void setState(ShooterStates state) {
         mDesiredState = state;
+    }
+
+    public synchronized boolean atSpeed() {
+        return mPeriodicIO.mCurrentLeftSpd/3 >= 3200; 
     }
 
     /**
