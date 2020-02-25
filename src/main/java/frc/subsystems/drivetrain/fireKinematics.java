@@ -1,19 +1,27 @@
 package frc.subsystems.drivetrain;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
-public class Kinematics {
+public class FireKinematics {
     private final double mTrackWidth;
     private final double mMaxOmega;
     private final double mMaxVel;
 
-    public Kinematics(double trackWidth, double maxVel) {
+    /**
+     * 
+     * @param trackWidth the center-to-center distance between wheels 
+     * @param maxVel
+     */
+    public FireKinematics(double trackWidth, double maxVel) {
         mTrackWidth = trackWidth;
         mMaxVel = maxVel;
         mMaxOmega = (mMaxVel * 2) / mTrackWidth;
 
     }
 
+    /**
+     * turns demanded velocity and angular velocity into left and right wheel speeds
+     * @param vel translation velocity of the robot
+     * @param omega rotational velocity of the robot
+     */
     public DriveSignal toWheelSpeeds(double vel, double omega) {
         vel = vel * mMaxVel;
         omega = omega * mMaxOmega;
@@ -23,6 +31,12 @@ public class Kinematics {
         return signal;
     }
 
+    /**
+     * broken dont use
+     * @param vel
+     * @param curv
+     * @return
+     */
     public DriveSignal toCurveWheelSpeeds(double vel, double curv) {
 
         double omega = vel * mMaxOmega;

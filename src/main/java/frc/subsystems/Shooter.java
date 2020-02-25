@@ -17,6 +17,7 @@ public class Shooter implements ISubsystem {
         IDLE,
         SPINNING_UP,
         MAINTAIN_SPEED,
+        OPEN_LOOP;
     }
     private PeriodicIO mPeriodicIO = new PeriodicIO();
 
@@ -32,12 +33,23 @@ public class Shooter implements ISubsystem {
     private CANEncoder mRightEncoder;
 
     private static Shooter instance;
+
+    /**
+     * Singleton method for use throughout the robot
+     * @return instance of the shooter
+     */
     public static Shooter getInstance() {
         if (instance == null) {
             instance = new Shooter(new CANSparkMax(RobotMap.SHOOTER_LEFT, MotorType.kBrushless), new CANSparkMax(RobotMap.SHOOTER_RIGHT, MotorType.kBrushless));
         }
         return instance;
     }
+
+    /**
+     * Ctor - Do not use unless for static builders or unit testing
+     * @param shooterLeft SparkMax instance for the left of the shooter
+     * @param shooterRight SparkMax instance for the right of the shooter
+     */
     public Shooter(CANSparkMax shooterLeft, CANSparkMax shooterRight) {
         mShooterLeft  = shooterLeft;
         mShooterRight = shooterRight;
@@ -45,8 +57,8 @@ public class Shooter implements ISubsystem {
         mShooterLeft.enableVoltageCompensation(12);
         mShooterRight.enableVoltageCompensation(12);
 
-        mShooterLeft.setSmartCurrentLimit(40);
-        mShooterRight.setSmartCurrentLimit(40);
+        mShooterLeft.setSmartCurrentLimit(27);
+        mShooterRight.setSmartCurrentLimit(27);
 
         mLeftPID  = mShooterLeft.getPIDController();
         mRightPID = mShooterRight.getPIDController();
@@ -54,18 +66,26 @@ public class Shooter implements ISubsystem {
         mLeftEncoder  = mShooterLeft.getEncoder();
         mRightEncoder = mShooterRight.getEncoder();
 
-        mLeftPID.setP(0.0015);
-        mRightPID.setP(0.002);
-        mLeftPID.setP(0.00015);
-        mRightPID.setP(0.0002);
-        mLeftPID.setFF(0.00009804);
-        mRightPID.setFF(0.0001);
+        
+        //TODO Tune these
+         
+        mLeftPID.setP(0.0000011494/2);
+        mRightPID.setP(0.0000010526/2);
+        mLeftPID.setD(0);
+        mRightPID.setD(0);
+        mLeftPID.setFF(0.00015);
+        mRightPID.setFF(0.00014567);
 
-        mShooterLeft.setInverted(true);
+        mShooterLeft.setInverted(false);
+        mShooterRight.setInverted(true);
     }
 
-    public void setState(ShooterStates state) {
+    public synchronized void setState(ShooterStates state) {
         mDesiredState = state;
+    }
+
+    public synchronized boolean atSpeed() {
+        return mPeriodicIO.mCurrentLeftSpd/3 >= 3200; 
     }
 
     /**
@@ -74,7 +94,7 @@ public class Shooter implements ISubsystem {
      */
     private void set(double percent) {
         mLeftPID.setReference(percent, ControlType.kDutyCycle);
-        mRightPID.setReference(-percent, ControlType.kDutyCycle);
+        mRightPID.setReference(percent, ControlType.kDutyCycle);
     }
 
     /**
@@ -83,7 +103,7 @@ public class Shooter implements ISubsystem {
      */
     private void setRPM(double rpm) {
         mLeftPID.setReference(rpm, ControlType.kVelocity);
-        mRightPID.setReference(rpm, ControlType.kVelocity);
+        mRightPID.setReference(-rpm, ControlType.kVelocity);
     }
 
     public void stop() {
@@ -100,65 +120,12 @@ public class Shooter implements ISubsystem {
         mPeriodicIO.mDemandedPercent = demandedPercent;
         mPeriodicIO.mDemandedRPM     = demandedRPM;
     }
-    
 
-    @Override
-    public void updateSmartDashboard() {
-        // TODO Auto-generated method stub
-        SmartDashboard.putNumber("Shooter Left RPM", (mPeriodicIO.mCurrentLeftSpd/4096)*600);
-        SmartDashboard.putNumber("Shooter Right RPM", (mPeriodicIO.mCurrentRightSpd/4096)*600);
-        SmartDashboard.putNumber("Motor Left RPM", mPeriodicIO.mCurrentLeftSpd);
-        SmartDashboard.putNumber("Motor Right RPM", mPeriodicIO.mCurrentRightSpd);
-        SmartDashboard.putNumber("Shooter Demanded RPM", mPeriodicIO.mDemandedRPM);
 
-    }
-
-    @Override
-    public void pollTelemetry() {
-        // TODO Auto-generated method stub
-        mPeriodicIO.mCurrentLeftSpd  = mLeftEncoder.getVelocity();
-        mPeriodicIO.mCurrentRightSpd = mRightEncoder.getVelocity();
-
-    }
-
-    @Override
-    public void registerEnabledLoops(ILooper enabledLooper) {
-        // TODO Auto-generated method stub
-        enabledLooper.register(new Loop(){
-        
-            @Override
-            public void onStop(double timestamp) {
-                set(0);
-                
-            }
-        
-            @Override
-            public void onStart(double timestamp) {
-                set(0);
-                
-            }
-        
-            @Override
-            public void onLoop(double timestamp) {
-                synchronized(this) {
-                    if(mDesiredState != ShooterStates.IDLE) {
-                        handleCloseLoop();
-                    } else {
-                        stop();
-                    }
-    
-                    if(mPeriodicIO.mCurrentLeftSpd == 0 && mPeriodicIO.mCurrentRightSpd == 0) {
-                        mCurrentState = ShooterStates.IDLE;
-                    }
-                }
-                
-
-            }
-        });
-
-    }
-
-    public void handleCloseLoop() {
+    /**
+     * handles close loop control and state changes between spinning up and holding speed
+     */
+    private void handleCloseLoop() {
         if (Math.abs(mPeriodicIO.mCurrentLeftSpd) < mPeriodicIO.mDemandedRPM + 100) {
             mCurrentState = ShooterStates.SPINNING_UP;
         } else if (Math.abs(mPeriodicIO.mCurrentLeftSpd) > mPeriodicIO.mDemandedRPM - 100 && Math.abs(mPeriodicIO.mCurrentLeftSpd) < mPeriodicIO.mDemandedPercent + 100) {
@@ -175,6 +142,74 @@ public class Shooter implements ISubsystem {
         }
 
     }
+
+    /**
+     * handles driving the shooter in openloop control
+     */
+    private void handleOpenLoop() {
+        set(mPeriodicIO.mDemandedPercent);
+        mCurrentState = ShooterStates.OPEN_LOOP;
+    }
+    
+
+    @Override
+    public void updateSmartDashboard() {
+        SmartDashboard.putNumber("Shooter Left RPM", (mPeriodicIO.mCurrentLeftSpd/3));
+        SmartDashboard.putNumber("Shooter Right RPM", (mPeriodicIO.mCurrentRightSpd/3));
+        SmartDashboard.putNumber("Motor Left RPM", mPeriodicIO.mCurrentLeftSpd);
+        SmartDashboard.putNumber("Motor Right RPM", mPeriodicIO.mCurrentRightSpd);
+        SmartDashboard.putNumber("Shooter Demanded RPM", mPeriodicIO.mDemandedRPM);
+        SmartDashboard.putString("Shooter state",(mCurrentState == ShooterStates.OPEN_LOOP ? "Open loop" : "not open loop"));
+
+    }
+
+    @Override
+    public void pollTelemetry() {
+        mPeriodicIO.mCurrentLeftSpd  = mLeftEncoder.getVelocity();
+        mPeriodicIO.mCurrentRightSpd = mRightEncoder.getVelocity();
+
+    }
+
+    @Override
+    public void registerEnabledLoops(ILooper enabledLooper) {
+        enabledLooper.register(new Loop(){
+        
+            @Override
+            public void onStop(double timestamp) {
+                set(0);
+                
+            }
+        
+            @Override
+            public void onStart(double timestamp) {
+                set(0);
+                
+            }
+        
+            @Override
+            public void onLoop(double timestamp) {
+                synchronized(Shooter.this) {
+                    if(mDesiredState != ShooterStates.IDLE && mDesiredState != ShooterStates.OPEN_LOOP) {
+                        handleCloseLoop();
+                    } else if(mDesiredState == ShooterStates.OPEN_LOOP) {
+                        handleOpenLoop();
+                    } else {
+                        stop();
+                    }
+    
+                    if(mPeriodicIO.mCurrentLeftSpd == 0 && mPeriodicIO.mCurrentRightSpd == 0) {
+                        mCurrentState = ShooterStates.IDLE;
+                    }
+
+                }
+                
+
+            }
+        });
+
+    }
+
+    
 
 
     private class PeriodicIO {
