@@ -24,9 +24,13 @@ public class GoalFlow { // Use the goals to do things with the robot here
     public Goal getGoal() {
         return this.currentGoal;
     } // Get the current goal
+    
+    public void goalAlert(String message){
+        SmartDashboard.putString("Goalflow-event",message);
+    }
 
     public void endGoal(){
-        SmartDashboard.putString("GOALFLOW_EVT", "Terminated the goal flow. This is only a sample: If you are seeing this, someone did something wrong.");
+        this.goalAlert("A goal detached. This is a sample message, and if you are seeing this someone did something wrong.");
         this.currentGoal=Goal.NONE;
     } // Detach the goal
 
