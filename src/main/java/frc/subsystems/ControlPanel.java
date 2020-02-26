@@ -50,9 +50,9 @@ public class ControlPanel extends GoalFlow{
 
     public void runGoal(int tick,Object... args) {
         super.runGoal(tick, args);
+        Color color=m_colorSensor.getColor();
         if(this.currentGoal == Goal.INTROTATIONS){
             
         }
-        Color color=m_colorSensor.getColor();
     }
 }
