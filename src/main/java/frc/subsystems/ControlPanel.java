@@ -1,11 +1,7 @@
 package frc.subsystems;
 
-import java.util.Dictionary;
 import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Map;
 
-import com.revrobotics.ColorMatch;
 import com.revrobotics.ColorSensorV3;
 
 import edu.wpi.first.wpilibj.DriverStation;
@@ -31,7 +27,7 @@ public class ControlPanel extends GoalFlow{
         this.controlPanel.setSpeed(0);
     }
     public void runGoal(Object... args) {
-        super.runGoal(args);;
+        super.runGoal(args);
         Color color=m_colorSensor.getColor();
         if (this.currentGoal==Goal.INTROTATIONS){
             this.controlPanel.setSpeed(this.neo550Speed);
@@ -55,9 +51,8 @@ public class ControlPanel extends GoalFlow{
                 }
             }
             else{
-                ColorMatch colorMatcher = new ColorMatch();
                 String message=DriverStation.getInstance().getGameSpecificMessage();
-                HashMap<String,Color> pairs=new HashMap();
+                HashMap<String,Color> pairs=new HashMap<String,Color>();
                 pairs.put("G", Color.kLime);
                 pairs.put("B", Color.kBlue);
                 pairs.put("R", Color.kRed);
