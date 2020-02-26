@@ -5,22 +5,24 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-
 // HFOV for logitech webcam 70.42
 // VFOV for logitech webacm 41.94
 package frc.robot;
 
 import java.util.Arrays;
 
+import frc.subsystems.GoalFlow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.TimedRobot;
 import firelib.looper.Looper;
 import frc.controls.ControlBoard;
+import frc.subsystems.ControlPanel;
 import frc.subsystems.Indexer;
 import frc.subsystems.Intake;
 import frc.subsystems.Turret;
 import frc.subsystems.Shooter;
 import frc.subsystems.Shooter.ShooterStates;
+import frc.subsystems.Goal;
 
 import frc.subsystems.SuperstructureAngle;
 /**
@@ -37,6 +39,7 @@ import frc.utils.KingMathUtils;
 import frc.utils.ToggleBoolean;
 
 public class Robot extends TimedRobot {
+  private ControlPanel mControlPanel;
   private Looper mEnabledLooper = new Looper();
   private Looper mDisabledLooper = new Looper();
   private ControlBoard mControls = ControlBoard.getInstance();
@@ -101,9 +104,22 @@ public class Robot extends TimedRobot {
     }
 
   }
+  public void createControlPanel(){
+    mControlPanel=new ControlPanel();
+  }
+  public void controlPanelIntRotations(){
+    mControlPanel.setGoal(Goal.INTROTATIONS);
+  }
+  public void controlPanelToColor(){
+    mControlPanel.setGoal(Goal.TOCOLOR);
+  }
+  public void controlPanelRun(){
+    mControlPanel.runGoal();
+  }
 
   @Override
   public void teleopPeriodic() {
+    controlPanelRun(); //TODO: (To Andrew Cua): Change the position of this if necessary. It won't break anything, the control panel is self contained.
     double throttle = KingMathUtils.clampD(mControls.getYThrottle(), 0.075);
     double rot = KingMathUtils.clampD(mControls.getXThrottle(), 0.075);
 
