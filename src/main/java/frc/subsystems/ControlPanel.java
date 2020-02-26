@@ -40,6 +40,8 @@ import frc.subsystems.GoalFlow;
 
 public class ControlPanel extends GoalFlow{
     private Neo550Wrapper controlPanel;
+    private Color currColor;
+    private int passes=0;
     private final I2C.Port i2cPort = I2C.Port.kOnboard;
     private final ColorSensorV3 m_colorSensor = new ColorSensorV3(i2cPort);
     public ControlPanel(){
@@ -47,6 +49,20 @@ public class ControlPanel extends GoalFlow{
         controlPanel=new Neo550Wrapper(RobotMap.CONTROLPANEL_ROTATOR);
     }
     public void runGoal(Object... args) {
+        super.runGoal(args);;
         Color color=m_colorSensor.getColor();
+        if (this.currentGoal==Goal.INTROTATIONS){
+            if (this.tick==0){
+                this.currColor=color;
+            }
+            else{
+                if (color==this.currColor){
+                    this.passes+=1;
+                }
+                if (this.passes>=6){
+                    this.endGoal();
+                }
+            }
+        }
     }
 }
