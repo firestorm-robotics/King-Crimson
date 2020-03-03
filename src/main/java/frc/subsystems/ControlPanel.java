@@ -12,6 +12,7 @@ import frc.subsystems.GoalFlow;
 import frc.subsystems.function_switches.Controlpanel_ColorSwitch;
 
 public class ControlPanel extends GoalFlow{
+    
     private Neo550Wrapper controlPanel;
     private Color currColor;
     public  int passes=0;
