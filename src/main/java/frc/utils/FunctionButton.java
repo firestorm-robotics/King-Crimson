@@ -1,6 +1,6 @@
 package frc.utils;
 
-class FunctionButton{
+public class FunctionButton {
     protected boolean swit;
     public FunctionButton(){
         this.swit=false;

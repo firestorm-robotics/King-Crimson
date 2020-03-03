@@ -9,15 +9,17 @@ import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.RobotMap;
 import frc.subsystems.GoalFlow;
+import frc.subsystems.function_switches.Controlpanel_ColorSwitch;
 
 public class ControlPanel extends GoalFlow{
     private Neo550Wrapper controlPanel;
     private Color currColor;
-    private int passes=0;
+    public  int passes=0;
     private boolean gotColor=false;
     private double neo550Speed=0.3; //TODO: Find out the actual speed required. 0.3 probably works, but we might want to go higher.
     private final I2C.Port i2cPort = I2C.Port.kOnboard;
     private final ColorSensorV3 m_colorSensor = new ColorSensorV3(i2cPort);
+    private Controlpanel_ColorSwitch cp_cs=new Controlpanel_ColorSwitch();
     public ControlPanel(){
         super();
         controlPanel=new Neo550Wrapper(RobotMap.CONTROLPANEL_ROTATOR);
@@ -35,8 +37,11 @@ public class ControlPanel extends GoalFlow{
                 this.currColor=color;
             }
             else{
-                if (color==this.currColor){
-                    this.passes+=1;
+                if (this.currColor==color){
+                    this.cp_cs.stateIsTrue(this);
+                }
+                else {
+                    this.cp_cs.stateIsFalse(this);
                 }
                 if (this.passes>=6){
                     this.endGoal();
